@@ -1,0 +1,89 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Angel's Quest</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #F2E9CE;
+      overflow: hidden;
+      font-family: sans-serif;
+    }canvas {
+  display: block;
+  background: #D96C80;
+  margin: 0 auto;
+}
+
+#instructions {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.7);
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #BF2A52;
+}
+
+  </style>
+</head>
+<body>
+  <div id="instructions">Use Arrow Keys to Move Angel ✨</div>
+  <canvas id="game" width="400" height="600"></canvas>  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    // Player
+    const angel = {
+      x: 200,
+      y: 500,
+      size: 30,
+      speed: 4,
+      color: "#F2AE2E"
+    };
+
+    const keys = { left: false, right: false, up: false, down: false };
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") keys.left = true;
+      if (e.key === "ArrowRight") keys.right = true;
+      if (e.key === "ArrowUp") keys.up = true;
+      if (e.key === "ArrowDown") keys.down = true;
+    });
+
+    document.addEventListener("keyup", (e) => {
+      if (e.key === "ArrowLeft") keys.left = false;
+      if (e.key === "ArrowRight") keys.right = false;
+      if (e.key === "ArrowUp") keys.up = false;
+      if (e.key === "ArrowDown") keys.down = false;
+    });
+
+    function update() {
+      if (keys.left && angel.x > 0) angel.x -= angel.speed;
+      if (keys.right && angel.x < canvas.width - angel.size) angel.x += angel.speed;
+      if (keys.up && angel.y > 0) angel.y -= angel.speed;
+      if (keys.down && angel.y < canvas.height - angel.size) angel.y += angel.speed;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Angel character (circle)
+      ctx.fillStyle = angel.color;
+      ctx.beginPath();
+      ctx.arc(angel.x, angel.y, angel.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    loop();
+  </script></body>
+</html>
