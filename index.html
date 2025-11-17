@@ -1,89 +1,95 @@
-<!DOCTYPE html><html lang="en">
+
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Angel's Quest</title>
-  <style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Angel’s Quest</title>
+
+<style>
     body {
-      margin: 0;
-      padding: 0;
-      background: #F2E9CE;
-      overflow: hidden;
-      font-family: sans-serif;
-    }canvas {
-  display: block;
-  background: #D96C80;
-  margin: 0 auto;
-}
+        margin: 0;
+        background: linear-gradient(to bottom, pink 50%, lightgreen 50%);
+        font-family: Arial, sans-serif;
+        overflow: hidden;
+    }
 
-#instructions {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.7);
-  padding: 10px 20px;
-  border-radius: 12px;
-  font-size: 14px;
-  color: #BF2A52;
-}
+    #game-area {
+        width: 100%;
+        height: 80vh;
+        position: relative;
+    }
 
-  </style>
+    /* Character */
+    #player {
+        width: 40px;
+        height: 40px;
+        background: purple;
+        border-radius: 8px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    /* Controls */
+    .controls {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        width: 50px;
+        height: 50px;
+        background: rgba(0,0,0,0.2);
+        color: white;
+        font-size: 30px;
+        font-weight: bold;
+        text-align: center;
+        line-height: 50px;
+        border-radius: 12px;
+        user-select: none;
+    }
+</style>
 </head>
+
 <body>
-  <div id="instructions">Use Arrow Keys to Move Angel ✨</div>
-  <canvas id="game" width="400" height="600"></canvas>  <script>
-    const canvas = document.getElementById("game");
-    const ctx = canvas.getContext("2d");
 
-    // Player
-    const angel = {
-      x: 200,
-      y: 500,
-      size: 30,
-      speed: 4,
-      color: "#F2AE2E"
-    };
+<h3 style="text-align:center;">Tap the buttons to move your hero ✨</h3>
 
-    const keys = { left: false, right: false, up: false, down: false };
+<div id="game-area">
+    <div id="player"></div>
+</div>
 
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowLeft") keys.left = true;
-      if (e.key === "ArrowRight") keys.right = true;
-      if (e.key === "ArrowUp") keys.up = true;
-      if (e.key === "ArrowDown") keys.down = true;
-    });
+<!-- Controls -->
+<div class="controls">
+    <div class="btn" id="left">←</div>
+    <div class="btn" id="up">↑</div>
+    <div class="btn" id="down">↓</div>
+    <div class="btn" id="right">→</div>
+</div>
 
-    document.addEventListener("keyup", (e) => {
-      if (e.key === "ArrowLeft") keys.left = false;
-      if (e.key === "ArrowRight") keys.right = false;
-      if (e.key === "ArrowUp") keys.up = false;
-      if (e.key === "ArrowDown") keys.down = false;
-    });
+<script>
+    const player = document.getElementById("player");
+    let x = window.innerWidth / 2;
+    let y = window.innerHeight / 2;
 
-    function update() {
-      if (keys.left && angel.x > 0) angel.x -= angel.speed;
-      if (keys.right && angel.x < canvas.width - angel.size) angel.x += angel.speed;
-      if (keys.up && angel.y > 0) angel.y -= angel.speed;
-      if (keys.down && angel.y < canvas.height - angel.size) angel.y += angel.speed;
+    function move(dx, dy) {
+        x += dx;
+        y += dy;
+        player.style.left = x + "px";
+        player.style.top = y + "px";
     }
 
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Touch controls
+    document.getElementById("left").onclick = () => move(-10, 0);
+    document.getElementById("right").onclick = () => move(10, 0);
+    document.getElementById("up").onclick = () => move(0, -10);
+    document.getElementById("down").onclick = () => move(0, 10);
+</script>
 
-      // Angel character (circle)
-      ctx.fillStyle = angel.color;
-      ctx.beginPath();
-      ctx.arc(angel.x, angel.y, angel.size, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    function loop() {
-      update();
-      draw();
-      requestAnimationFrame(loop);
-    }
-
-    loop();
-  </script></body>
+</body>
 </html>
