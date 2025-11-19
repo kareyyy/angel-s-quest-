@@ -5,60 +5,44 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Angel's Quest — Level 1</title>
   <style>
-    :root{
-      --p1:#D96C80;--p2:#BF2A52;--p3:#BFB74B;--p4:#F2E9CE;--p5:#F2AE2E;
-      --ink:#3a2b2b;--card:#fff;
-    }
+    :root{--p1:#D96C80;--p2:#BF2A52;--p3:#BFB74B;--p4:#F2E9CE;--p5:#F2AE2E;--ink:#3a2b2b;--card:#fff}
     *{box-sizing:border-box}
     html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
     body{background:linear-gradient(180deg,var(--p4) 0%, #fff 100%);color:var(--ink);}
 
-    /* Top bar */
     .topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;max-width:1000px;margin:0 auto}
     .brand{display:flex;align-items:center;gap:12px}
     .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--p1),var(--p2));display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
     .title{font-weight:700}
 
-    /* Game area */
     .stage-wrap{max-width:980px;margin:10px auto;padding:8px}
     #stage{width:100%;height:68vh;border-radius:16px;background:linear-gradient(180deg,#FCEFEA 0%, #F8F2E8 100%);position:relative;overflow:hidden;box-shadow:0 12px 36px rgba(191,42,82,0.08)}
 
-    /* HUD */
     .hud{display:flex;justify-content:space-between;padding:10px 6px}
     .hud .box{background:var(--card);padding:8px 12px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.06);font-weight:600}
 
-    /* Player */
     .player{position:absolute;width:44px;height:44px;border-radius:10px;background:linear-gradient(180deg,var(--p5),var(--p3));display:flex;align-items:center;justify-content:center;color:#2b1f1f;font-weight:700;box-shadow:0 8px 20px rgba(0,0,0,0.08)}
-    .player .wing{position:absolute;left:-12px;top:8px;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,0.6);transform:rotate(-25deg)}
+    .wing{position:absolute;left:-12px;top:8px;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,0.6);transform:rotate(-25deg)}
 
-    /* Stars */
-    .star{position:absolute;width:28px;height:28px;border-radius:6px;background:linear-gradient(180deg,#fff,#FFD86D);display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 8px 18px rgba(0,0,0,0.08)}
-
-    /* Enemy */
+    .star{position:absolute;width:28px;height:28px;border-radius:6px;background:linear-gradient(180deg,#fff,#FFD86D);display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 8px 18px rgba(0,0,0,0.08);transform-origin:center}
     .shadow{position:absolute;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.18);display:flex;align-items:center;justify-content:center;color:#fff}
 
-    /* Controls */
     .controls{position:relative;height:84px;margin-top:12px;display:flex;justify-content:center;gap:10px}
-    .btn{width:58px;height:58px;border-radius:12px;background:linear-gradient(180deg,rgba(0,0,0,0.06),rgba(0,0,0,0.02));display:flex;align-items:center;justify-content:center;font-size:22px}
+    .btn{width:58px;height:58px;border-radius:12px;background:linear-gradient(180deg,rgba(0,0,0,0.06),rgba(0,0,0,0.02));display:flex;align-items:center;justify-content:center;font-size:22px;user-select:none}
 
-    /* Story overlay */
     .overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(58,43,43,0.06),rgba(58,43,43,0.06));display:flex;align-items:center;justify-content:center;padding:20px}
     .panel{width:min(720px,94%);background:var(--card);border-radius:16px;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,0.08);text-align:left}
     .panel h2{margin-top:0;color:var(--p2);font-family:Patrick Hand,Inter}
     .panel p{color:#594646}
     .panel .actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
-    .chip{padding:8px 12px;border-radius:12px;background:linear-gradient(180deg,var(--p1),var(--p2));color:white;font-weight:700}
+    .chip{padding:8px 12px;border-radius:12px;background:linear-gradient(180deg,var(--p1),var(--p2));color:white;font-weight:700;cursor:pointer}
 
-    /* Win screen */
     .win{position:absolute;inset:12% 8%;display:flex;align-items:center;justify-content:center}
 
-    /* small screens */
     @media (max-width:540px){.player{width:40px;height:40px}.btn{width:48px;height:48px}}
-
   </style>
 </head>
 <body>
-
   <div class="topbar">
     <div class="brand"><div class="logo">WS</div><div><div class="title">Wangari Studio</div><small>Angel's Quest - Level 1</small></div></div>
     <div class="hud"><div class="box" id="scoreBox">Stars: 0</div><div class="box" id="goalBox">Goal: 5</div></div>
@@ -66,26 +50,21 @@
 
   <div class="stage-wrap">
     <div id="stage">
-      <!-- story overlay -> shown at start and between scenes -->
       <div class="overlay" id="storyOverlay">
         <div class="panel">
-          <h2>Hello, Angel ✨</h2>
+          <h2>Hello, traveller ✨</h2>
           <p>You woke up in the Dream Realm. Little stars have scattered across the field — collect them to restore the light. But watch out for drifting shadows. Use the arrows or the on-screen buttons to move. Ready?</p>
           <div class="actions"><div class="chip" id="startBtn">Start Quest</div></div>
         </div>
       </div>
 
-      <!-- player -->
       <div id="player" class="player" style="left:46%;top:70%">
         <div class="wing"></div>
         <div style="z-index:2">A</div>
       </div>
 
-      <!-- dynamic objects go here -->
-
     </div>
 
-    <!-- controls -->
     <div class="controls">
       <div class="btn" id="btnLeft">◀</div>
       <div class="btn" id="btnUp">▲</div>
@@ -94,19 +73,18 @@
     </div>
   </div>
 
-  <!-- win overlay placeholder -->
   <div id="winOverlay" style="display:none">
     <div class="overlay win">
       <div class="panel" style="text-align:center">
         <h2>You did it! ✨</h2>
         <p>All stars collected. The Dream Realm glows again. Well done, Angel Wangari.</p>
-        <div style="margin-top:14px"><button id="replay" class="chip">Play Again</button></div>
+        <div style="margin-top:14px"><div id="replay" class="chip">Play Again</div></div>
       </div>
     </div>
   </div>
 
 <script>
-// ---- Game variables
+// === Variables & DOM
 const stage = document.getElementById('stage');
 const playerEl = document.getElementById('player');
 const scoreBox = document.getElementById('scoreBox');
@@ -116,181 +94,64 @@ const startBtn = document.getElementById('startBtn');
 const winOverlay = document.getElementById('winOverlay');
 const replayBtn = document.getElementById('replay');
 
-let score = 0;
-let goal = 5; // stars to collect
-let objects = []; // stars & shadows
-let running = false;
-let w = 0, h = 0;
+let score = 0; const goal = 5; let objects = []; let running = false; let w=0,h=0;
 
-// responsive stage size
-function updateStageSize(){
-  const rect = stage.getBoundingClientRect();
-  w = rect.width; h = rect.height;
-}
+function updateStageSize(){ const rect = stage.getBoundingClientRect(); w = rect.width; h = rect.height; }
 updateStageSize(); window.addEventListener('resize', updateStageSize);
 
-// player position
-let player = {x: w*0.46, y: h*0.7, w:44, h:44, speed:6};
-playerEl.style.left = (player.x)+'px';
-playerEl.style.top = (player.y)+'px';
+let player = {x: 0, y: 0, w:44, h:44, speed:2.2}; // slow movement
+player.x = window.innerWidth * 0.46; player.y = window.innerHeight * 0.68; // will be repositioned
 
-// input handling
+// input
 const keys = {left:false,right:false,up:false,down:false};
-window.addEventListener('keydown', e=>{
-  if(!running) return;
-  if(e.key==='ArrowLeft') keys.left=true;
-  if(e.key==='ArrowRight') keys.right=true;
-  if(e.key==='ArrowUp') keys.up=true;
-  if(e.key==='ArrowDown') keys.down=true;
-});
-window.addEventListener('keyup', e=>{
-  if(e.key==='ArrowLeft') keys.left=false;
-  if(e.key==='ArrowRight') keys.right=false;
-  if(e.key==='ArrowUp') keys.up=false;
-  if(e.key==='ArrowDown') keys.down=false;
-});
+window.addEventListener('keydown', e => { if(!running) return; if(e.key==='ArrowLeft'||e.key==='a') keys.left=true; if(e.key==='ArrowRight'||e.key==='d') keys.right=true; if(e.key==='ArrowUp'||e.key==='w') keys.up=true; if(e.key==='ArrowDown'||e.key==='s') keys.down=true; });
+window.addEventListener('keyup', e => { if(e.key==='ArrowLeft'||e.key==='a') keys.left=false; if(e.key==='ArrowRight'||e.key==='d') keys.right=false; if(e.key==='ArrowUp'||e.key==='w') keys.up=false; if(e.key==='ArrowDown'||e.key==='s') keys.down=false; });
 
-// touch buttons
-['Left','Up','Down','Right'].forEach(dir=>{
-  const b = document.getElementById('btn'+dir);
-  b.addEventListener('touchstart', e=>{ e.preventDefault(); keys[dir.toLowerCase()]=true; });
-  b.addEventListener('touchend', e=>{ e.preventDefault(); keys[dir.toLowerCase()]=false; });
-  b.addEventListener('mousedown', e=>{ keys[dir.toLowerCase()]=true; });
-  b.addEventListener('mouseup', e=>{ keys[dir.toLowerCase()]=false; });
-});
+// robust pointer/touch handlers for buttons
+function attachControlHandlers(btnId, dir){ const el = document.getElementById(btnId); if(!el) return; el.style.touchAction='none'; el.style.cursor='pointer';
+  if(window.PointerEvent){ el.addEventListener('pointerdown', e=>{ e.preventDefault(); keys[dir]=true }); el.addEventListener('pointerup', e=>{ e.preventDefault(); keys[dir]=false }); el.addEventListener('pointercancel', e=>{ keys[dir]=false }); }
+  else { el.addEventListener('touchstart', e=>{ e.preventDefault(); keys[dir]=true }, {passive:false}); el.addEventListener('touchend', e=>{ e.preventDefault(); keys[dir]=false }, {passive:false}); el.addEventListener('mousedown', ()=>keys[dir]=true); el.addEventListener('mouseup', ()=>keys[dir]=false); }
+  el.addEventListener('click', ()=>{ keys[dir]=true; setTimeout(()=>keys[dir]=false,120); }); }
+attachControlHandlers('btnLeft','left'); attachControlHandlers('btnUp','up'); attachControlHandlers('btnDown','down'); attachControlHandlers('btnRight','right');
 
 // helpers
 function rand(min,max){ return Math.random()*(max-min)+min }
-function createStar(){
-  const el = document.createElement('div'); el.className='star';
-  const size = 24 + Math.floor(Math.random()*12);
-  el.style.width=size+'px'; el.style.height=size+'px';
-  const x = rand(12, w-40); const y = rand(12, h-140);
-  el.style.left = x+'px'; el.style.top = y+'px';
-  el.dataset.type='star';
-  stage.appendChild(el);
-  objects.push({el,type:'star',x,y,w:size,h:size});
-}
+function createStar(){ const el=document.createElement('div'); el.className='star'; const size=24+Math.floor(Math.random()*12); el.style.width=size+'px'; el.style.height=size+'px'; const x=rand(12,w-40); const y=rand(12,h-140); el.style.left=x+'px'; el.style.top=y+'px'; stage.appendChild(el); objects.push({el,type:'star',x,y,w:size,h:size}); }
+function createShadow(){ const el=document.createElement('div'); el.className='shadow'; const x = Math.random()>0.5? -60 : w+60; const y = rand(40, h-120); el.style.left = x+'px'; el.style.top = y+'px'; stage.appendChild(el); const speed = (Math.random()*0.6)+0.4; objects.push({el,type:'shadow',x,y,w:36,h:36,dir: x<0?1:-1, speed}); }
+function isColliding(a,b){ return !(a.x + a.w < b.x || a.x > b.x + b.w || a.y + a.h < b.y || a.y > b.y + b.h); }
 
-function createShadow(){
-  const el = document.createElement('div'); el.className='shadow';
-  const x = Math.random()>0.5? -40 : w+40; // spawn left or right
-  const y = rand(40, h-120);
-  el.style.left = x+'px'; el.style.top = y+'px';
-  stage.appendChild(el);
-  const speed = (Math.random()*0.7)+0.6; // px per frame
-  objects.push({el,type:'shadow',x,y,w:36,h:36,dir: x<0?1:-1, speed});
-}
-
-// collision
-function isColliding(a,b){
-  return !(a.x + a.w < b.x || a.x > b.x + b.w || a.y + a.h < b.y || a.y > b.y + b.h);
-}
-
-// audio (simple beeps)
-const AudioCtx = window.AudioContext || window.webkitAudioContext;
-let audioCtx;
-function playTone(freq, time=0.08){
-  if(!audioCtx) audioCtx = new AudioCtx();
-  const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
-  o.type='sine'; o.frequency.value=freq; g.gain.value=0.06;
-  o.connect(g); g.connect(audioCtx.destination);
-  o.start(); o.stop(audioCtx.currentTime + time);
-}
+// audio
+const AudioCtx = window.AudioContext || window.webkitAudioContext; let audioCtx;
+function playTone(freq, time=0.08){ try{ if(!audioCtx) audioCtx = new AudioCtx(); const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type='sine'; o.frequency.value=freq; g.gain.value=0.05; o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + time); }catch(e){/* fail silently on older browsers */} }
 
 // update loop
-function update(){
-  if(!running) return;
-  // move player
-  if(keys.left) player.x -= player.speed; if(keys.right) player.x += player.speed;
-  if(keys.up) player.y -= player.speed; if(keys.down) player.y += player.speed;
+function update(){ if(!running) return; // move player
+  if(keys.left) player.x -= player.speed; if(keys.right) player.x += player.speed; if(keys.up) player.y -= player.speed; if(keys.down) player.y += player.speed;
   // bounds
-  player.x = Math.max(8, Math.min(w - player.w - 8, player.x));
-  player.y = Math.max(8, Math.min(h - player.h - 8, player.y));
+  player.x = Math.max(8, Math.min(w - player.w - 8, player.x)); player.y = Math.max(8, Math.min(h - player.h - 8, player.y));
   playerEl.style.left = player.x + 'px'; playerEl.style.top = player.y + 'px';
 
-  // update objects
-  for(let i=objects.length-1;i>=0;i--){
-    const obj = objects[i];
-    if(obj.type==='shadow'){
-      obj.x += obj.dir * obj.speed * 2; obj.el.style.left = obj.x+'px';
-      // if off-screen remove
-      if(obj.x < -80 || obj.x > w+80){ obj.el.remove(); objects.splice(i,1); }
-    }
-    if(obj.type==='star'){
-      // gentle bob
-      const t = Date.now()/600; obj.el.style.top = (obj.y + Math.sin(t + i)*6) + 'px';
-    }
-
-    // collision with player
-    if(isColliding(player, obj)){
-      if(obj.type==='star'){
-        // collect
-        score++; scoreBox.textContent = 'Stars: '+score;
-        playTone(880,0.06);
-        obj.el.remove(); objects.splice(i,1);
-        if(score>=goal) win();
-      } else if(obj.type==='shadow'){
-        // hit -> small penalty
-        if(score>0) score = Math.max(0, score-1);
-        scoreBox.textContent = 'Stars: '+score;
-        playTone(220,0.08);
-        // knockback
-        player.x -= obj.dir*30; player.y -= 12; // push away
-      }
-    }
+  for(let i=objects.length-1;i>=0;i--){ const obj = objects[i]; if(obj.type==='shadow'){ obj.x += obj.dir * obj.speed * 2; obj.el.style.left = obj.x+'px'; if(obj.x < -100 || obj.x > w+100){ obj.el.remove(); objects.splice(i,1);} }
+    if(obj.type==='star'){ const t = Date.now()/600; obj.el.style.top = (obj.y + Math.sin(t + i)*6) + 'px'; }
+    if(isColliding(player, obj)){ if(obj.type==='star'){ score++; scoreBox.textContent='Stars: '+score; playTone(880,0.06); obj.el.remove(); objects.splice(i,1); if(score>=goal) win(); } else if(obj.type==='shadow'){ if(score>0) score = Math.max(0, score-1); scoreBox.textContent='Stars: '+score; playTone(220,0.08); player.x -= obj.dir*30; player.y -= 12; } }
   }
-
   requestAnimationFrame(update);
 }
 
-// spawn controller
-let spawnTimer = 0;
-function tick(){
-  if(!running) return;
-  spawnTimer++;
-  if(spawnTimer % 90 === 0) createStar(); // every ~1.5s
-  if(spawnTimer % 160 === 0) createShadow();
-  requestAnimationFrame(tick);
+let spawnTimer=0; function tick(){ if(!running) return; spawnTimer++; if(spawnTimer % 110 === 0) createStar(); if(spawnTimer % 200 === 0) createShadow(); requestAnimationFrame(tick); }
+
+function startGame(){ updateStageSize(); score=0; scoreBox.textContent='Stars: 0'; objects.forEach(o=>o.el.remove()); objects=[]; player.x = w*0.46; player.y = h*0.68; playerEl.style.left=player.x+'px'; playerEl.style.top=player.y+'px'; for(let i=0;i<3;i++) createStar(); running=true; storyOverlay.style.display='none'; winOverlay.style.display='none'; update(); tick(); // unlock audio on first interaction
+  try{ if(!audioCtx) audioCtx = new AudioCtx(); }catch(e){}
 }
+function win(){ running=false; winOverlay.style.display='block'; playTone(1100,0.18); playTone(660,0.12); }
+startBtn.addEventListener('click', ()=>{ startGame(); }); replayBtn && replayBtn.addEventListener('click', ()=>{ startGame(); winOverlay.style.display='none'; }); storyOverlay.addEventListener('click', ()=>{ startGame(); });
 
-// start game
-function startGame(){
-  // reset
-  score = 0; scoreBox.textContent='Stars: 0';
-  objects.forEach(o=>o.el.remove()); objects=[];
-  // place player center
-  updateStageSize(); player.x = w*0.46; player.y = h*0.68; playerEl.style.left=player.x+'px'; playerEl.style.top=player.y+'px';
-  // spawn initial stars
-  for(let i=0;i<3;i++) createStar();
-  running = true; storyOverlay.style.display='none'; winOverlay.style.display='none';
-  // loops
-  update(); tick();
-}
+// ensure stage dims before first start
+window.addEventListener('load', ()=>{ updateStageSize(); const rect = stage.getBoundingClientRect(); w=rect.width; h=rect.height; // position player element
+  player.x = w*0.46; player.y = h*0.68; playerEl.style.left = player.x + 'px'; playerEl.style.top = player.y + 'px'; });
 
-function win(){
-  running=false; winOverlay.style.display='block';
-  playTone(1100,0.18); playTone(660,0.12);
-}
-
-// story next / start
-startBtn.addEventListener('click', ()=>{
-  startGame();
-});
-replayBtn && replayBtn.addEventListener('click', ()=>{ startGame(); winOverlay.style.display='none'; });
-
-// ensure stage size & re-position player
-function updateStageSize(){
-  const rect = stage.getBoundingClientRect(); w = rect.width; h = rect.height; player.w = player.w || 44; player.h = player.h || 44;
-}
-window.addEventListener('resize', ()=>{ updateStageSize(); });
-
-// set goal box
-goalBox.textContent = 'Goal: '+goal;
-
-// allow tapping overlay to proceed (mobile friendly)
-storyOverlay.addEventListener('click', ()=>{ startGame(); });
-
+// expose small debug for dev
+window._aq = { startGame, score: ()=>score, objects };
 </script>
 </body>
 </html>
