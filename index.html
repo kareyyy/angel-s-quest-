@@ -1,30 +1,386 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Angel's Quest</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Angel's Quest — Clean Version</title>
+<style>
+  :root{
+    --bg1:#ffecd2; --bg2:#ffa8a5;
+    --card:#fff; --ink:#2b1f1f;
+    --p1:#D96C80; --p2:#BF2A52; --accent:#F2AE2E;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;font-family:Inter,system-ui,Arial;background:#0a0a1a;color:var(--ink);}
+
+  /* layout */
+  #game-wrapper{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+  #game-container{width:900px;height:650px;border-radius:18px;overflow:hidden;position:relative;
+    background:linear-gradient(180deg,var(--bg1) 0%, #F8F2E8 70%, var(--bg2) 100%);box-shadow:0 20px 60px rgba(0,0,0,0.6);
+  }
+
+  /* starfield */
+  .star{position:absolute;background:#fff;border-radius:50%;opacity:0.85;animation:twinkle 3s ease-in-out infinite}
+  @keyframes twinkle{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:1;transform:scale(1.2)}}
+
+  /* Title / Story / Win screens */
+  .overlay-screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1100}
+  #title-screen{background:linear-gradient(135deg, rgba(102,126,234,0.96), rgba(118,75,162,0.96));backdrop-filter:blur(6px);flex-direction:column;padding:40px;text-align:center}
+  #title-screen h1{font-family:Georgia,serif;color:#fff;font-size:44px;margin-bottom:12px;text-shadow:0 0 20px rgba(255,215,0,.6)}
+  #title-screen p{color:#f5f5f5;max-width:700px;margin-bottom:22px;line-height:1.6}
+  .btn{appearance:none;border:0;padding:14px 36px;border-radius:999px;background:linear-gradient(135deg,var(--accent),var(--p2));color:#fff;font-weight:700;cursor:pointer}
+
+  #story-screen,#win-screen{display:none;flex-direction:column;padding:36px;text-align:center;color:#fff}
+  #story-screen h2,#win-screen h2{color:var(--p2);font-family:Georgia,serif;margin-bottom:8px}
+  #win-screen .stats{background:rgba(255,255,255,0.08);padding:16px;border-radius:12px;color:#fff;margin-top:12px}
+
+  /* HUD */
+  #hud{position:absolute;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;z-index:1000;pointer-events:none}
+  .hud-item{background:rgba(255,255,255,0.92);padding:10px 14px;border-radius:12px;font-weight:700;color:#333;pointer-events:auto}
+
+  /* player - sprite image */
+  #player{position:absolute;width:86px;height:86px;left:425px;top:520px;z-index:500;transform-origin:center center;pointer-events:none}
+  #player img{width:100%;height:100%;object-fit:contain;display:block;transition:transform .12s ease}
+  /* idle float */
+  .idle { animation:float 2000ms ease-in-out infinite; }
+  @keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+  /* walking tilt classes applied to img */
+  .walk-left { transform: rotate(-10deg) translateY(0); }
+  .walk-right { transform: rotate(10deg) translateY(0); }
+  .walk-up { transform: translateY(-4px) scale(1.04); }
+  .walk-down { transform: translateY(4px) scale(0.98); }
+
+  /* tiles - visual svg injected per type */
+  .tile{position:absolute;width:46px;height:46px;border-radius:12px;box-shadow:0 8px 22px rgba(0,0,0,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:300;transition:transform .18s ease,opacity .25s ease}
+  .tile.gold{background:linear-gradient(135deg,#ffd89b,#ffb26b)}
+  .tile.crystal{background:linear-gradient(135deg,#bfe9ff,#f8d6ff)}
+  .tile.star{background:linear-gradient(135deg,#c3d8ff,#e7d6ff)}
+  .tile svg{width:26px;height:26px;pointer-events:none}
+  .tile.collected{transform:scale(0);opacity:0}
+
+  /* obstacles */
+  .obstacle{position:absolute;background:linear-gradient(180deg,#333,#111);border-radius:10px;z-index:250;box-shadow:0 8px 20px rgba(0,0,0,0.4)}
+
+  /* particle */
+  .particle{position:absolute;width:10px;height:10px;border-radius:50%;background:gold;pointer-events:none;z-index:400;animation:particleFade 900ms ease-out forwards}
+  @keyframes particleFade{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0)}}
+
+  /* controls / mobile */
+  #controls{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.9);padding:10px 14px;border-radius:12px;z-index:900}
+  #mobile-controls{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);display:none;gap:10px;z-index:900}
+  .control-row{display:flex;gap:10px;justify-content:center}
+  .control-btn{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.95);display:flex;align-items:center;justify-content:center;font-weight:700;user-select:none}
+
+  /* responsive */
+  @media(max-width:780px){
+    #game-container{width:100vw;height:100vh;border-radius:0}
+    #mobile-controls{display:block}
+    #controls{display:none}
+  }
+</style>
 </head>
-
 <body>
+  <div id="game-wrapper">
+    <div id="game-container">
+      <div id="starfield"></div>
 
-  <div id="game-area">
+      <!-- Title -->
+      <div id="title-screen" class="overlay-screen">
+        <div id="title-inner" style="max-width:820px">
+          <h1>Angel's Quest</h1>
+          <p>Welcome, traveler. A gentle quest awaits: collect the sacred tiles across three realms. Move with WASD / arrows or the on-screen buttons on mobile.</p>
+          <div style="margin-top:18px"><button id="start-btn" class="btn">Begin Your Journey</button></div>
+        </div>
+      </div>
 
-    <h1 class="title">Hello Traveller</h1>
+      <!-- Story -->
+      <div id="story-screen" class="overlay-screen">
+        <div style="max-width:760px;background:rgba(255,255,255,0.03);padding:28px;border-radius:12px">
+          <h2 id="story-title">Chapter</h2>
+          <p id="story-text" style="color:#fff;line-height:1.6"></p>
+          <div style="margin-top:18px;text-align:right"><button id="continue-btn" class="btn">Continue</button></div>
+        </div>
+      </div>
 
-    <button id="startBtn">Start Quest</button>
+      <!-- HUD -->
+      <div id="hud">
+        <div class="hud-item" id="score">Tiles: 0 / 7</div>
+        <div class="hud-item" id="level">Level: 1</div>
+      </div>
 
-    <div id="player" class="player hidden">
-      <img 
-        src="/mnt/data/A_2D_digital_illustration_features_a_cartoon_angel.png"
-        alt="traveller"
-        class="sprite idle"
-      >
+      <!-- Player (sprite image) -->
+      <div id="player" aria-hidden="false">
+        <img id="player-img" class="idle" src="/mnt/data/A_2D_digital_illustration_features_a_cartoon_angel.png" alt="traveller sprite">
+      </div>
+
+      <!-- Controls hint (desktop) -->
+      <div id="controls">Use WASD / Arrow keys to move — Collect all tiles</div>
+
+      <!-- Mobile Controls -->
+      <div id="mobile-controls">
+        <div class="control-row"><div class="control-btn" data-key="w">↑</div></div>
+        <div class="control-row">
+          <div class="control-btn" data-key="a">←</div>
+          <div class="control-btn" data-key="s">↓</div>
+          <div class="control-btn" data-key="d">→</div>
+        </div>
+      </div>
+
+      <!-- Win -->
+      <div id="win-screen" class="overlay-screen" style="display:none">
+        <div style="max-width:760px;text-align:center">
+          <h2>Well done, Angel Wangari!</h2>
+          <p>You completed your journey.</p>
+          <div class="stats" id="final-score">Total Tiles: 0</div>
+          <div style="margin-top:12px"><button id="replay-btn" class="btn">Play Again</button></div>
+        </div>
+      </div>
+
+      <!-- Controls for desktop (invisible but present for styling) -->
+      <div id="controls" style="pointer-events:none"></div>
     </div>
-
   </div>
 
-<script src="script.js"></script>
+<script>
+/* ========= Data (levels WITHOUT emojis) ========= */
+const LEVELS = [
+  {
+    name: "Meadow of Beginnings",
+    story: "The Meadow of Beginnings awaits. Gather the golden tiles that hold ancient wisdom...",
+    tiles: [
+      {x:150,y:150,type:'gold'}, {x:700,y:150,type:'gold'}, {x:425,y:300,type:'gold'},
+      {x:200,y:480,type:'gold'}, {x:650,y:480,type:'gold'}, {x:350,y:500,type:'gold'},
+      {x:500,y:500,type:'gold'}
+    ],
+    obstacles:[]
+  },
+  {
+    name: "Crystal Caverns",
+    story: "Deep within the Crystal Caverns, mystical gems await your discovery. Navigate carefully...",
+    tiles: [
+      {x:120,y:120,type:'crystal'}, {x:730,y:120,type:'crystal'}, {x:425,y:200,type:'crystal'},
+      {x:250,y:400,type:'crystal'}, {x:600,y:400,type:'crystal'}, {x:425,y:520,type:'crystal'},
+      {x:150,y:300,type:'crystal'}
+    ],
+    obstacles:[
+      {x:350,y:300,w:150,h:50},{x:200,y:200,w:50,h:100},{x:600,y:250,w:50,h:150}
+    ]
+  },
+  {
+    name: "Starlight Sanctuary",
+    story: "You've reached the final realm — the Starlight Sanctuary. Collect the celestial stars to complete your quest!",
+    tiles:[
+      {x:100,y:100,type:'star'},{x:750,y:100,type:'star'},{x:425,y:150,type:'star'},
+      {x:200,y:450,type:'star'},{x:650,y:450,type:'star'},{x:300,y:300,type:'star'},
+      {x:550,y:300,type:'star'}
+    ],
+    obstacles:[
+      {x:200,y:250,w:100,h:30},{x:550,y:250,w:100,h:30},{x:375,y:400,w:100,h:30}
+    ]
+  }
+];
+
+/* ========= State ========= */
+const gameState = {
+  playerX:425, playerY:520, playerSpeed:3.2, // slow
+  score:0, totalScore:0, currentLevel:0, tiles:[], obstacles:[], gameStarted:false, isWalking:false
+};
+
+/* ========= DOM ========= */
+const playerEl = document.getElementById('player');
+const playerImg = document.getElementById('player-img');
+const scoreEl = document.getElementById('score');
+const levelEl = document.getElementById('level');
+const titleScreen = document.getElementById('title-screen');
+const storyScreen = document.getElementById('story-screen');
+const winScreen = document.getElementById('win-screen');
+const gameContainer = document.getElementById('game-container');
+const starfield = document.getElementById('starfield');
+
+/* ========= Helpers ========= */
+function rand(min,max){ return Math.random()*(max-min)+min }
+
+/* generate small inline SVG for each tile type (no emoji) */
+function svgFor(type){
+  if(type==='gold'){
+    return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#ffd86d" d="M12 2l2.4 5.5L20 10l-5 3.6L16 20 12 16.8 8 20l1-6.4L4 10l5.6-2.5L12 2z"/></svg>`;
+  } else if(type==='crystal'){
+    return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#a8edea" d="M12 2l4 6 6 2-6 4-4 6-4-6L2 10l6-2 4-6z"/></svg>`;
+  } else { // star
+    return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#ffe9a8" d="M12 .9l3.1 6.3L22 8.2l-5 4.8L18.2 22 12 18.6 5.8 22 7 13 2 8.2l6.9-1L12 .9z"/></svg>`;
+  }
+}
+
+/* create starfield */
+function createStarfield(){
+  for(let i=0;i<30;i++){
+    const s=document.createElement('div'); s.className='star';
+    const size = Math.random()*3+1;
+    s.style.width=s.style.height=size+'px';
+    s.style.left = Math.random()*100+'%';
+    s.style.top = Math.random()*100+'%';
+    s.style.animationDelay = Math.random()*3+'s';
+    starfield.appendChild(s);
+  }
+}
+createStarfield();
+
+/* ========= UI flow ========= */
+document.getElementById('start-btn').addEventListener('click', ()=>{
+  titleScreen.style.display='none';
+  showStory();
+});
+document.getElementById('continue-btn').addEventListener('click', ()=>{
+  storyScreen.style.display='none';
+  if(!gameState.gameStarted){ gameState.gameStarted=true; loadLevel(0); gameLoop(); } else loadLevel(gameState.currentLevel);
+});
+document.getElementById('replay-btn').addEventListener('click', ()=>{ location.reload(); });
+
+function showStory(){
+  const lvl=LEVELS[gameState.currentLevel];
+  document.getElementById('story-title').textContent = `Chapter ${gameState.currentLevel+1}: ${lvl.name}`;
+  document.getElementById('story-text').textContent = lvl.story;
+  storyScreen.style.display='flex';
+}
+
+/* ========= Load Level (spawn tiles and obstacles) ========= */
+function loadLevel(index){
+  gameState.currentLevel = index;
+  gameState.score = 0;
+  gameState.tiles = []; gameState.obstacles = [];
+  // remove existing
+  document.querySelectorAll('.tile, .obstacle').forEach(el=>el.remove());
+  const lvl = LEVELS[index];
+  levelEl.textContent = `Level: ${index+1}`;
+  scoreEl.textContent = `Tiles: 0 / ${lvl.tiles.length}`;
+  // reset player
+  gameState.playerX = 425; gameState.playerY = 520; playerEl.style.left = gameState.playerX + 'px'; playerEl.style.top = gameState.playerY + 'px';
+  // spawn tiles
+  lvl.tiles.forEach((t,i)=>{
+    const el = document.createElement('div'); el.className = 'tile ' + t.type;
+    el.innerHTML = svgFor(t.type);
+    el.style.left = t.x + 'px'; el.style.top = t.y + 'px';
+    el.dataset.index = i;
+    gameContainer.appendChild(el);
+    gameState.tiles.push({element:el,x:t.x,y:t.y,collected:false});
+  });
+  // spawn obstacles
+  (lvl.obstacles||[]).forEach(o=>{
+    const ob = document.createElement('div'); ob.className='obstacle';
+    ob.style.left=o.x+'px'; ob.style.top=o.y+'px'; ob.style.width=o.w+'px'; ob.style.height=o.h+'px';
+    gameContainer.appendChild(ob);
+    gameState.obstacles.push({x:o.x,y:o.y,w:o.w,h:o.h});
+  });
+}
+
+/* ========= Input handling ========= */
+const keys = {};
+window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; if(['arrowup','arrowdown','arrowleft','arrowright'].includes(e.key.toLowerCase())) e.preventDefault(); });
+window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+document.querySelectorAll('.control-btn').forEach(btn=>{
+  btn.addEventListener('touchstart', e=>{ e.preventDefault(); keys[btn.dataset.key] = true; });
+  btn.addEventListener('touchend', e=>{ e.preventDefault(); keys[btn.dataset.key] = false; });
+  btn.addEventListener('mousedown', e=>{ keys[btn.dataset.key] = true; });
+  btn.addEventListener('mouseup', e=>{ keys[btn.dataset.key] = false; });
+});
+
+/* ========= Collision helper ========= */
+function rectsOverlap(ax,ay,aw,ah,bx,by,bw,bh){
+  return !(ax+aw < bx || ax > bx+bw || ay+ah < by || ay > by+bh);
+}
+
+/* ========= Particles ========= */
+function createParticles(cx,cy){
+  for(let i=0;i<8;i++){
+    const p = document.createElement('div'); p.className='particle';
+    p.style.left = (cx) + 'px'; p.style.top = (cy) + 'px';
+    const angle = (Math.PI*2*i)/8; const dist = 20 + Math.random()*30;
+    p.style.setProperty('--tx', Math.cos(angle)*dist+'px'); p.style.setProperty('--ty', Math.sin(angle)*dist+'px');
+    gameContainer.appendChild(p);
+    setTimeout(()=>p.remove(),900);
+  }
+}
+
+/* ========= Game loop ========= */
+let lastTime = 0;
+function gameLoop(timestamp){
+  if(!gameState.gameStarted) return;
+  if(!lastTime) lastTime = timestamp;
+  const dt = timestamp - lastTime; lastTime = timestamp;
+
+  // compute proposed position
+  let nx = gameState.playerX; let ny = gameState.playerY; let moving=false;
+  if(keys['w']||keys['arrowup']){ ny = Math.max(4, gameState.playerY - gameState.playerSpeed); moving=true; playerImg.classList.add('walk-up'); }
+  if(keys['s']||keys['arrowdown']){ ny = Math.min(gameContainer.clientHeight-100, gameState.playerY + gameState.playerSpeed); moving=true; playerImg.classList.add('walk-down'); }
+  if(keys['a']||keys['arrowleft']){ nx = Math.max(4, gameState.playerX - gameState.playerSpeed); moving=true; playerImg.classList.add('walk-left'); }
+  if(keys['d']||keys['arrowright']){ nx = Math.min(gameContainer.clientWidth-90, gameState.playerX + gameState.playerSpeed); moving=true; playerImg.classList.add('walk-right'); }
+
+  // if no movement, ensure idle
+  if(!moving){
+    playerImg.classList.remove('walk-left','walk-right','walk-up','walk-down');
+    if(!playerImg.classList.contains('idle')) playerImg.classList.add('idle');
+  } else {
+    playerImg.classList.remove('idle');
+  }
+
+  // obstacle collision test
+  let collided = false;
+  for(const obs of gameState.obstacles){
+    if(rectsOverlap(nx, ny, 60, 70, obs.x, obs.y, obs.w, obs.h)){ collided=true; break; }
+  }
+  if(!collided){ gameState.playerX = nx; gameState.playerY = ny; playerEl.style.left = gameState.playerX + 'px'; playerEl.style.top = gameState.playerY + 'px'; }
+
+  // check tile collisions
+  for(const t of gameState.tiles){
+    if(!t.collected){
+      const dist = Math.hypot(gameState.playerX+30 - (t.x+23), gameState.playerY+35 - (t.y+23));
+      if(dist < 48){
+        t.collected = true;
+        createParticles(t.x+23, t.y+23);
+        t.element.classList.add('collected');
+        setTimeout(()=>t.element.remove(),300);
+        gameState.score++; gameState.totalScore++;
+        scoreEl.textContent = `Tiles: ${gameState.score} / ${LEVELS[gameState.currentLevel].tiles.length}`;
+        // level complete?
+        if(gameState.score === LEVELS[gameState.currentLevel].tiles.length){
+          if(gameState.currentLevel < LEVELS.length -1){
+            // next level story
+            setTimeout(()=>{ gameState.currentLevel++; showStory(); }, 700);
+            gameState.gameStarted = false; // pause loop until next continue
+            return;
+          } else {
+            // final win
+            setTimeout(()=>{ winGame(); }, 700); gameState.gameStarted=false; return;
+          }
+        }
+      }
+    }
+  }
+
+  requestAnimationFrame(gameLoop);
+}
+
+/* ========= Start / Win ========= */
+function loadInitial(){ playerEl.style.left = gameState.playerX + 'px'; playerEl.style.top = gameState.playerY + 'px'; }
+loadInitial();
+
+document.getElementById('continue-btn').addEventListener('click', ()=>{
+  if(!gameState.gameStarted){
+    gameState.gameStarted = true;
+    loadLevel(0);
+    requestAnimationFrame(gameLoop);
+  }
+});
+
+function winGame(){
+  document.getElementById('final-score').textContent = `Total Tiles: ${gameState.totalScore}`;
+  winScreen.style.display = 'flex';
+}
+
+/* ensure stage resizes gracefully */
+window.addEventListener('resize', ()=>{ /* nothing heavy needed here */ });
+
+</script>
 </body>
 </html>
