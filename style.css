@@ -75,9 +75,26 @@ background:linear-gradient(180deg,var(--bg1) 0%, #F8F2E8 70%, var(--bg2) 100%);b
 #mobile-controls{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);display:none;gap:10px;z-index:910;}
 .control-row{display:flex;gap:10px;justify-content:center}
 .control-btn{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.95);display:flex;align-items:center;justify-content:center;font-weight:700;user-select:none;font-size:2rem;box-shadow:0 4px 12px #0002}
-
-@media(max-width:780px){
-  #game-container{width:100vw;height:100vh;border-radius:0}
-  #mobile-controls{display:block}
-  #controls{display:none}
+@media (max-width: 480px) {
+  #game-container {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    min-width: 0;
+    min-height: 0;
+  }
+  #player, #enemy, .tile {
+    width: 40px !important;
+    height: 40px !important;
+  }
+  .tile {
+    border-radius: 7px !important;
+  }
+  #hud {
+    font-size: 1em;
+    top: 5px;
+    left: 0;
+    right: 0;
+    padding: 0 3px;
+  }
 }
