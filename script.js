@@ -41,16 +41,18 @@ function createStarfield(){
 }
 createStarfield();
 
-// ====== Responsive Controls ======
+// ====== Adjust Scaling on Resize (for touch, phone/tablet, etc) ======
+function updateScale() {
+  // This ensures all elements scale smoothly if container size changes (esp mobile)
+  // (You can expand this for more advanced layouts)
+  // Currently handlded mainly in CSS clamp() for font sizes and dimensions!
+}
+window.addEventListener('resize', updateScale);
+updateScale();
+
+// ====== Responsive Controls Hint ======
 function updateControlsForDevice() {
-  const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-  if (isMobile) {
-    mobileControls.style.display = 'block';
-    controls.style.display = 'none';
-  } else {
-    mobileControls.style.display = 'none';
-    controls.style.display = 'block';
-  }
+  // Handled by CSS, but keep for future custom logic if needed.
 }
 window.addEventListener('resize', updateControlsForDevice);
 updateControlsForDevice();
@@ -66,24 +68,27 @@ function startGame(){
   gameState.score = 0;
   scoreEl.textContent = `Tiles: 0 / ${LEVELS[0].tiles.length}`;
   levelEl.textContent = "Level: 1";
-  gameState.playerX = 425; gameState.playerY = 520;
+  // Slightly center for narrower screens
+  let w = gameContainer.clientWidth, h = gameContainer.clientHeight;
+  gameState.playerX = Math.floor(w/2-30); gameState.playerY = Math.floor(h*0.8-30);
   playerEl.style.left = gameState.playerX+'px'; playerEl.style.top = gameState.playerY+'px';
   document.querySelectorAll('.tile').forEach(el=>el.remove());
   gameState.tiles = [];
   LEVELS[0].tiles.forEach((t,i)=>{
     const el=document.createElement('div');
     el.className='tile gem';
-    el.style.left=t.x+'px'; el.style.top=t.y+'px';
+    el.style.left=t.x/(900/w)+'px'; el.style.top=t.y/(650/h)+'px';
     gameContainer.appendChild(el);
-    gameState.tiles.push({element:el, x:t.x, y:t.y, collected:false});
+    gameState.tiles.push({element:el,
+      x:t.x/(900/w), y:t.y/(650/h), collected:false});
   });
   // Enemy setup
   const enemyData = LEVELS[0].enemy;
-  gameState.enemyX = enemyData.x;
-  gameState.enemyY = enemyData.y;
-  gameState.enemySpeed = enemyData.speed;
-  enemyEl.style.left = `${enemyData.x}px`;
-  enemyEl.style.top  = `${enemyData.y}px`;
+  gameState.enemyX = enemyData.x/(900/w);
+  gameState.enemyY = enemyData.y/(650/h);
+  gameState.enemySpeed = enemyData.speed*Math.max(w/900, h/650); // scale speed
+  enemyEl.style.left = `${gameState.enemyX}px`;
+  enemyEl.style.top  = `${gameState.enemyY}px`;
   enemyEl.style.display = 'block';
   gameState.enemyActive = true;
   requestAnimationFrame(gameLoop);
@@ -97,6 +102,7 @@ window.addEventListener('keydown', e=>{
 });
 window.addEventListener('keyup',   e=>{ keys[e.key.toLowerCase()]=false; });
 
+// On-screen mobile controls
 document.querySelectorAll('.control-btn').forEach(btn=>{
   btn.addEventListener('touchstart', e=>{ e.preventDefault(); keys[btn.dataset.key]=true;});
   btn.addEventListener('touchend', e=>{ e.preventDefault(); keys[btn.dataset.key]=false;});
@@ -115,8 +121,11 @@ function gameLoop(){
   if(keys['a']||keys['arrowleft']){ nx-=gameState.playerSpeed;   moving=true; playerEl.classList.add('walk-left'); }
   if(keys['d']||keys['arrowright']){nx+=gameState.playerSpeed;   moving=true; playerEl.classList.add('walk-right'); }
   if(!moving) playerEl.classList.add('idle');
-  nx = Math.max(4, Math.min(nx, gameContainer.clientWidth-64));
-  ny = Math.max(4, Math.min(ny, gameContainer.clientHeight-64));
+  // contain within game area
+  let w = gameContainer.clientWidth, h = gameContainer.clientHeight;
+  let playerW = playerEl.offsetWidth, playerH = playerEl.offsetHeight;
+  nx = Math.max(4, Math.min(nx, w-playerW-4));
+  ny = Math.max(4, Math.min(ny, h-playerH-4));
   gameState.playerX = nx; gameState.playerY = ny;
   playerEl.style.left = gameState.playerX+'px'; playerEl.style.top = gameState.playerY+'px';
 
@@ -127,12 +136,12 @@ function gameLoop(){
     const dist = Math.hypot(dx,dy) || 1;
     const spd = gameState.enemySpeed;
     ex += (dx/dist)*spd; ey += (dy/dist)*spd;
-    ex = Math.max(0, Math.min(ex, gameContainer.clientWidth-38));
-    ey = Math.max(0, Math.min(ey, gameContainer.clientHeight-38));
+    let ew = enemyEl.offsetWidth, eh = enemyEl.offsetHeight;
+    ex = Math.max(0, Math.min(ex, w-ew)); ey = Math.max(0, Math.min(ey, h-eh));
     gameState.enemyX = ex; gameState.enemyY = ey;
     enemyEl.style.left = `${ex}px`; enemyEl.style.top = `${ey}px`;
-    // Collision with player?
-    if (rectsOverlap(gameState.playerX,gameState.playerY,58,58,ex,ey,38,38)) {
+    // check collision with player
+    if (rectsOverlap(gameState.playerX,gameState.playerY,playerEl.offsetWidth,playerEl.offsetHeight,ex,ey,ew,eh)) {
       enemyEl.classList.add('hit');
       setTimeout(()=>enemyEl.classList.remove('hit'),300);
       setTimeout(resetLevel,360);
@@ -140,13 +149,13 @@ function gameLoop(){
     }
   }
 
-  // Tile collision
+  // Tile collision (proportional position)
   for(const t of gameState.tiles){
     if(!t.collected){
-      const dx = (gameState.playerX+30) - (t.x+19);
-      const dy = (gameState.playerY+30) - (t.y+19);
+      const dx = (gameState.playerX+playerEl.offsetWidth/2) - (t.x+t.element.offsetWidth/2);
+      const dy = (gameState.playerY+playerEl.offsetHeight/2) - (t.y+t.element.offsetHeight/2);
       const d = Math.hypot(dx,dy);
-      if(d < 36){
+      if(d < t.element.offsetWidth+10){
         t.collected = true;
         t.element.classList.add('collected');
         setTimeout(()=>t.element.remove(),250);
@@ -173,10 +182,7 @@ function rectsOverlap(ax,ay,aw,ah,bx,by,bw,bh){
   return !(ax+aw < bx || ax > bx+bw || ay+ah < by || ay > by+bh);
 }
 
-function resetLevel() {
-  // Re-center player and enemy, reset tiles
-  startGame();
-}
+function resetLevel() { startGame(); }
 
 // ====== INITIALIZE ======
 playerEl.style.left = gameState.playerX+'px';
