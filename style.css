@@ -7,35 +7,42 @@ html,body{height:100%;font-family:Inter,system-ui,Arial;background:#0a0a1a;color
 
 /* layout */
 #game-wrapper{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
-#game-container{width:900px;height:650px;border-radius:18px;overflow:hidden;position:relative;
-background:linear-gradient(180deg,var(--bg1) 0%, #F8F2E8 70%, var(--bg2) 100%);box-shadow:0 20px 60px rgba(0,0,0,0.6);}
+#game-container{
+  width: min(98vw, 900px);
+  height: min(98vh, 650px);
+  border-radius:18px;overflow:hidden;position:relative;
+  background:linear-gradient(180deg,var(--bg1) 0%, #F8F2E8 70%, var(--bg2) 100%);
+  box-shadow:0 20px 60px rgba(0,0,0,0.6);}
 #starfield{position:absolute;width:100%;height:100%;z-index:1}
 
 /* overlay screens */
 .overlay-screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1000;background:rgba(102,126,234,0.96);flex-direction:column;text-align:center;}
-.overlay-screen h1{font-family:Georgia,serif;color:#fff;font-size:40px;margin-bottom:12px;text-shadow:0 0 20px rgba(255,215,0,.6)}
-.overlay-screen p{color:#f5f5f5;max-width:700px;margin-bottom:22px;line-height:1.6}
-.btn{border:0;padding:12px 28px;border-radius:999px;background:linear-gradient(135deg,var(--accent),#BF2A52);color:#fff;font-weight:700;cursor:pointer;}
+.overlay-screen h1{font-family:Georgia,serif;color:#fff;font-size:clamp(1.8rem, 6vw, 2.5rem);margin-bottom:12px;text-shadow:0 0 20px rgba(255,215,0,.6)}
+.overlay-screen p{color:#f5f5f5;max-width:700px;margin-bottom:22px;line-height:1.6;font-size:clamp(1.1rem, 4vw, 1.4rem);}
+.btn{border:0;padding:12px 28px;border-radius:999px;background:linear-gradient(135deg,var(--accent),#BF2A52);color:#fff;font-weight:700;cursor:pointer;font-size:clamp(1rem, 4vw, 1.2rem);}
 
 /* HUD */
-#hud{position:absolute;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;z-index:1000;pointer-events:none}
+#hud{position:absolute;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;z-index:1000;pointer-events:none;font-size:clamp(1rem, 3vw, 1.3rem);}
 .hud-item{background:rgba(255,255,255,0.92);padding:10px 14px;border-radius:12px;font-weight:700;color:#333;pointer-events:auto}
 
 /* player - CSS character */
 #player{
-  position:absolute; width:60px; height:60px; left:425px; top:520px; z-index:500;
+  position:absolute;
+  width:clamp(32px, 7vw, 60px);
+  height:clamp(32px, 7vw, 60px);
+  left:425px; top:520px; z-index:500;
   background:radial-gradient(circle at 45% 41%, #ffeedd 60%, #f8b2e7 100%);
   border-radius:50%; border:3px solid #fff; box-shadow:0 2px 10px #bc96e7;
   display:flex;align-items:center;justify-content:center;transition:transform .17s;
 }
-#player::before { /* face decor */
+#player::before {
   content:"";
-  position:absolute;top:22px;left:17px;width:8px;height:8px;background:#fff;border-radius:50%;
-  box-shadow:18px 0 #fff;
+  position:absolute;top:40%;left:27%;width:17%;height:17%;background:#fff;border-radius:50%;
+  box-shadow:46% 0 #fff;
 }
-#player::after { /* smile */
+#player::after {
   content:"";
-  position:absolute;top:36px;left:18px;width:24px;height:10px;border-radius:0 0 24px 24px/0 0 12px 12px;border-bottom:3px solid #ed85bf;
+  position:absolute;top:60%;left:30%;width:40%;height:20%;border-radius:0 0 24px 24px/0 0 12px 12px;border-bottom:3px solid #ed85bf;
 }
 
 #player.walk-left { transform:translateX(-2px) rotate(-8deg);}
@@ -48,7 +55,7 @@ background:linear-gradient(180deg,var(--bg1) 0%, #F8F2E8 70%, var(--bg2) 100%);b
 /* enemy orb */
 #enemy {
   position: absolute;
-  width: 38px; height: 38px;
+  width:clamp(20px, 4vw, 38px); height:clamp(20px, 4vw, 38px);
   border-radius: 50%;
   background: radial-gradient(circle at 30% 25%, #333 60%, #232 100%);
   box-shadow: 0 8px 16px #2228;
@@ -61,7 +68,14 @@ background:linear-gradient(180deg,var(--bg1) 0%, #F8F2E8 70%, var(--bg2) 100%);b
 #enemy.hit {background:radial-gradient(circle at 30% 25%, #e33 60%, #600 100%);}
 
 /* tiles */
-.tile{position:absolute;width:38px;height:38px;border-radius:10px;box-shadow:0 6px 14px rgba(0,0,0,0.15);display:flex;align-items:center;justify-content:center;z-index:300;transition:transform .18s,opacity .2s;}
+.tile{
+  position:absolute;
+  width:clamp(16px, 3vw, 38px);
+  height:clamp(16px, 3vw, 38px);
+  border-radius:10px;box-shadow:0 6px 14px rgba(0,0,0,0.15);
+  display:flex;align-items:center;justify-content:center;z-index:300;
+  transition:transform .18s,opacity .2s;
+}
 .tile.gem{background:linear-gradient(135deg,#fae89b,#d86bff);}
 .tile.collected{transform:scale(0);opacity:0;}
 
@@ -70,12 +84,29 @@ background:linear-gradient(180deg,var(--bg1) 0%, #F8F2E8 70%, var(--bg2) 100%);b
 @keyframes twinkle{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:1;transform:scale(1.17)}}
 
 /* controls */
-#controls{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.9);padding:10px 14px;border-radius:12px;z-index:900;display:block;}
-
-#mobile-controls{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);display:none;gap:10px;z-index:910;}
+#controls {
+  position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
+  background:rgba(255,255,255,0.9);padding:10px 14px;
+  border-radius:12px;z-index:900;display:block;font-size:clamp(1rem, 3vw, 1.3rem);
+}
+#mobile-controls{
+  position:absolute;bottom:80px;left:50%;transform:translateX(-50%);
+  display:none;gap:10px;z-index:910;
+}
 .control-row{display:flex;gap:10px;justify-content:center}
-.control-btn{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.95);display:flex;align-items:center;justify-content:center;font-weight:700;user-select:none;font-size:2rem;box-shadow:0 4px 12px #0002}
-@media (max-width: 480px) {
+.control-btn{
+  width:clamp(38px, 9vw, 60px);
+  height:clamp(38px, 9vw, 60px);
+  border-radius:50%;
+  background:rgba(255,255,255,0.95);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;user-select:none;
+  font-size:clamp(1.5rem, 6vw, 2rem);
+  box-shadow:0 4px 12px #0002;
+}
+
+/* Responsive: really small screens */
+@media (max-width: 600px), (max-height: 600px) {
   #game-container {
     width: 100vw;
     height: 100vh;
@@ -83,18 +114,16 @@ background:linear-gradient(180deg,var(--bg1) 0%, #F8F2E8 70%, var(--bg2) 100%);b
     min-width: 0;
     min-height: 0;
   }
-  #player, #enemy, .tile {
-    width: 40px !important;
-    height: 40px !important;
-  }
-  .tile {
-    border-radius: 7px !important;
-  }
   #hud {
-    font-size: 1em;
-    top: 5px;
-    left: 0;
-    right: 0;
-    padding: 0 3px;
+    top:5px;
+    left:0;right:0;
+    padding:0 4px;
+    font-size:1rem;
   }
+}
+
+/* Mobile: show mobile, hide desktop controls */
+@media(max-width:780px){
+  #mobile-controls{display:block}
+  #controls{display:none}
 }
