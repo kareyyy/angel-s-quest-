@@ -16,7 +16,7 @@
         <div>
           <h1>Angel's Quest</h1>
           <p>Welcome, traveler. A gentle quest awaits: collect the sacred tiles.<br>
-             Move with <span class="kbd">WASD</span> / <span class="kbd">Arrows</span> or on-screen buttons (mobile).</p>
+             Move with <span class="kbd">WASD</span> / <span class="kbd">Arrows</span> or use on-screen buttons (mobile).</p>
           <button id="start-btn" class="btn">Begin Your Journey</button>
         </div>
       </div>
@@ -33,8 +33,9 @@
       <!-- Enemy -->
       <div id="enemy"></div>
 
-      <!-- Controls hint -->
+      <!-- Controls hint (desktop) -->
       <div id="controls">Use WASD / Arrow keys to move — Collect all tiles</div>
+      <!-- On-screen controls (mobile) -->
       <div id="mobile-controls">
         <div class="control-row"><div class="control-btn" data-key="w">↑</div></div>
         <div class="control-row">
@@ -43,7 +44,6 @@
           <div class="control-btn" data-key="d">→</div>
         </div>
       </div>
-
     </div>
   </div>
   <script src="script.js"></script>
