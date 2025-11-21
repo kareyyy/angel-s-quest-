@@ -1,129 +1,86 @@
 :root{
-  --bg1:#ffecd2; --bg2:#ffa8a5; --accent:#F2AE2E; --ink:#2b1f1f;
+  --bg1:#F2E9CE; --bg2:#F2AE2E;
+  --p1:#D96C80; --p2:#BF2A52; --accent:#BFB74B;
+  --ink:#2b1f1f;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:Inter,system-ui,Arial;background:#0a0a1a;color:var(--ink);}
-.kbd {display:inline-block;background:#333;color:#fff;padding:2px 7px;border-radius:5px;font-size:0.9em;margin:0 3px;}
 
-/* layout */
-#game-wrapper{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
-#game-container{
-  width: min(98vw, 900px);
-  height: min(98vh, 650px);
-  border-radius:18px;overflow:hidden;position:relative;
-  background:linear-gradient(180deg,var(--bg1) 0%, #F8F2E8 70%, var(--bg2) 100%);
-  box-shadow:0 20px 60px rgba(0,0,0,0.6);}
-#starfield{position:absolute;width:100%;height:100%;z-index:1}
+#game-wrapper{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:14px}
+#game-container{position:relative;width:min(98vw,900px);height:min(98vh,650px);border-radius:16px;overflow:hidden;
+  background:linear-gradient(180deg,var(--bg1),#fff 60%,var(--bg2));
+  box-shadow:0 20px 60px rgba(0,0,0,0.55);}
 
-/* overlay screens */
-.overlay-screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1000;background:rgba(102,126,234,0.96);flex-direction:column;text-align:center;}
-.overlay-screen h1{font-family:Georgia,serif;color:#fff;font-size:clamp(1.8rem, 6vw, 2.5rem);margin-bottom:12px;text-shadow:0 0 20px rgba(255,215,0,.6)}
-.overlay-screen p{color:#f5f5f5;max-width:700px;margin-bottom:22px;line-height:1.6;font-size:clamp(1.1rem, 4vw, 1.4rem);}
-.btn{border:0;padding:12px 28px;border-radius:999px;background:linear-gradient(135deg,var(--accent),#BF2A52);color:#fff;font-weight:700;cursor:pointer;font-size:clamp(1rem, 4vw, 1.2rem);}
-
-/* HUD */
-#hud{position:absolute;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;z-index:1000;pointer-events:none;font-size:clamp(1rem, 3vw, 1.3rem);}
-.hud-item{background:rgba(255,255,255,0.92);padding:10px 14px;border-radius:12px;font-weight:700;color:#333;pointer-events:auto}
-
-/* player - CSS character */
-#player{
-  position:absolute;
-  width:clamp(32px, 7vw, 60px);
-  height:clamp(32px, 7vw, 60px);
-  left:425px; top:520px; z-index:500;
-  background:radial-gradient(circle at 45% 41%, #ffeedd 60%, #f8b2e7 100%);
-  border-radius:50%; border:3px solid #fff; box-shadow:0 2px 10px #bc96e7;
-  display:flex;align-items:center;justify-content:center;transition:transform .17s;
-}
-#player::before {
-  content:"";
-  position:absolute;top:40%;left:27%;width:17%;height:17%;background:#fff;border-radius:50%;
-  box-shadow:46% 0 #fff;
-}
-#player::after {
-  content:"";
-  position:absolute;top:60%;left:30%;width:40%;height:20%;border-radius:0 0 24px 24px/0 0 12px 12px;border-bottom:3px solid #ed85bf;
-}
-
-#player.walk-left { transform:translateX(-2px) rotate(-8deg);}
-#player.walk-right{ transform:translateX(2px)  rotate(8deg);}
-#player.walk-up   { transform:translateY(-5px);}
-#player.walk-down { transform:translateY(5px);}
-#player.idle      { animation:float 1.6s ease-in-out infinite;}
-@keyframes float{0%,100%{transform:translateY(0)}55%{transform:translateY(-6px);}}
-
-/* enemy orb */
-#enemy {
-  position: absolute;
-  width:clamp(20px, 4vw, 38px); height:clamp(20px, 4vw, 38px);
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 25%, #333 60%, #232 100%);
-  box-shadow: 0 8px 16px #2228;
-  z-index: 400;
-  left: 200px; top: 100px;
-  border: 2.5px solid #75e275;
-  display:none;
-  transition:background .2s;
-}
-#enemy.hit {background:radial-gradient(circle at 30% 25%, #e33 60%, #600 100%);}
-
-/* tiles */
-.tile{
-  position:absolute;
-  width:clamp(16px, 3vw, 38px);
-  height:clamp(16px, 3vw, 38px);
-  border-radius:10px;box-shadow:0 6px 14px rgba(0,0,0,0.15);
-  display:flex;align-items:center;justify-content:center;z-index:300;
-  transition:transform .18s,opacity .2s;
-}
-.tile.gem{background:linear-gradient(135deg,#fae89b,#d86bff);}
-.tile.collected{transform:scale(0);opacity:0;}
+/* Parallax layers (subtle) */
+#parallax{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.layer{position:absolute;inset:0;background-repeat:repeat;opacity:0.25}
+.layer.back{background-image:linear-gradient(180deg,rgba(210,220,255,0.08),transparent)}
+.layer.mid{background-image:linear-gradient(180deg,transparent,rgba(255,240,230,0.03))}
+.layer.front{background-image:radial-gradient(circle at 10% 20%, rgba(255,255,255,0.04), transparent 10%)}
 
 /* starfield */
-.star{position:absolute;background:#fff;border-radius:50%;opacity:0.8;animation:twinkle 3s ease-in-out infinite}
-@keyframes twinkle{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:1;transform:scale(1.17)}}
+#starfield{position:absolute;inset:0;z-index:2;pointer-events:none}
+.star{position:absolute;background:#fff;border-radius:50%;opacity:0.85;animation:twinkle 3s linear infinite}
+@keyframes twinkle{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:1;transform:scale(1.2)}}
+
+/* overlay screens */
+.overlay-screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1000}
+.hidden{display:none}
+.card{background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));backdrop-filter:blur(6px);padding:22px;border-radius:12px;max-width:86%;text-align:center;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,0.45)}
+.card h1,.card h2{font-family:Georgia,serif;margin-bottom:8px}
+.card p{line-height:1.6;margin-bottom:16px;color:rgba(255,255,255,0.95)}
+.btn{appearance:none;border:0;padding:10px 18px;border-radius:999px;background:linear-gradient(135deg,var(--p1),var(--p2));color:#fff;font-weight:700;cursor:pointer}
+
+/* HUD */
+#hud{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;z-index:900;pointer-events:none}
+.hud-item{background:rgba(255,255,255,0.94);padding:8px 12px;border-radius:10px;font-weight:700;color:#333;pointer-events:auto}
+
+/* Player CSS sprite - compact layered shape */
+#player{position:absolute;width:64px;height:64px;left:420px;top:520px;z-index:400;transform-origin:center center;pointer-events:none}
+#player .body{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);width:56%;height:42%;background:linear-gradient(180deg,#fff,#ffdfef);border-radius:12px;box-shadow:inset 0 -6px 10px rgba(0,0,0,0.06)}
+#player .head{position:absolute;left:50%;top:26%;transform:translate(-50%,-50%);width:40%;height:36%;background:linear-gradient(180deg,#ffe9d6,#ffd6c3);border-radius:50%}
+#player .backpack{position:absolute;left:12%;top:45%;width:26%;height:44%;background:linear-gradient(180deg,#d1c6ff,#bfb0ff);border-radius:8px;transform:rotate(-8deg);box-shadow:0 6px 12px rgba(0,0,0,0.12)}
+#player .wing{position:absolute;width:26%;height:26%;background:linear-gradient(180deg,#fff8f8,#ffdfe8);border-radius:50%;box-shadow:0 6px 12px rgba(0,0,0,0.06);opacity:0.9}
+#player .wing-left{left:-6%;top:30%;transform:rotate(-35deg)}
+#player .wing-right{right:-6%;top:30%;transform:rotate(35deg)}
+
+/* player movement classes */
+#player.idle{animation:float 1800ms ease-in-out infinite}
+@keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+#player.walk-left{transform:translateX(-3px) rotate(-6deg)}
+#player.walk-right{transform:translateX(3px) rotate(6deg)}
+#player.walk-up{transform:translateY(-6px) scale(1.02)}
+#player.walk-down{transform:translateY(6px) scale(0.98)}
+
+/* tiles (SVG-based icons inside) */
+#tiles{position:absolute;inset:0;z-index:300;pointer-events:auto}
+.tile{position:absolute;width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(0,0,0,0.12);transition:transform .16s,opacity .18s}
+.tile.gold{background:linear-gradient(135deg,#ffd86d,#ffb26b)}
+.tile.crystal{background:linear-gradient(135deg,#c8f0f8,#f8d6ff)}
+.tile.star{background:linear-gradient(135deg,#dbe8ff,#f5e6ff)}
+.tile.collected{transform:scale(0);opacity:0}
+
+/* orbs (enemies) */
+#orbs{position:absolute;inset:0;z-index:350;pointer-events:none}
+.orb{position:absolute;width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 30% 30%, #222, #080808);box-shadow:0 12px 28px rgba(0,0,0,0.6);border:2px solid rgba(255,255,255,0.06)}
+
+/* particle */
+#particles{position:absolute;inset:0;z-index:380;pointer-events:none}
+.p{position:absolute;width:8px;height:8px;border-radius:50%;background:gold;animation:partFade .9s forwards}
+@keyframes partFade{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0)}}
 
 /* controls */
-#controls {
-  position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
-  background:rgba(255,255,255,0.9);padding:10px 14px;
-  border-radius:12px;z-index:900;display:block;font-size:clamp(1rem, 3vw, 1.3rem);
-}
-#mobile-controls{
-  position:absolute;bottom:80px;left:50%;transform:translateX(-50%);
-  display:none;gap:10px;z-index:910;
-}
+#controls{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.92);padding:8px 12px;border-radius:12px;z-index:900;font-weight:600}
+#mobile-controls{position:absolute;bottom:84px;left:50%;transform:translateX(-50%);display:none;gap:10px;z-index:900}
 .control-row{display:flex;gap:10px;justify-content:center}
-.control-btn{
-  width:clamp(38px, 9vw, 60px);
-  height:clamp(38px, 9vw, 60px);
-  border-radius:50%;
-  background:rgba(255,255,255,0.95);
-  display:flex;align-items:center;justify-content:center;
-  font-weight:700;user-select:none;
-  font-size:clamp(1.5rem, 6vw, 2rem);
-  box-shadow:0 4px 12px #0002;
-}
+.control-btn{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;font-weight:700;user-select:none}
 
-/* Responsive: really small screens */
-@media (max-width: 600px), (max-height: 600px) {
-  #game-container {
-    width: 100vw;
-    height: 100vh;
-    border-radius: 0;
-    min-width: 0;
-    min-height: 0;
-  }
-  #hud {
-    top:5px;
-    left:0;right:0;
-    padding:0 4px;
-    font-size:1rem;
-  }
-}
+/* win screen fine */
+#win-screen .card{max-width:640px}
 
-/* Mobile: show mobile, hide desktop controls */
+/* responsive */
 @media(max-width:780px){
   #mobile-controls{display:block}
   #controls{display:none}
+  #player{width:56px;height:56px}
 }
