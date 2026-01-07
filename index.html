@@ -1,92 +1,341 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Angel's Quest — Traveler (2D CSS sprites)</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div id="game-wrapper">
-    <div id="game-container">
-      <div id="parallax">
-        <div class="layer back"></div>
-        <div class="layer mid"></div>
-        <div class="layer front"></div>
-      </div>
+ createStarfield();
 
-      <div id="starfield"></div>
+    // Event listeners
+    document.getElementById('start-btn').addEventListener('click', () => {
+        titleScreen.classList.add('hidden');
+        gameState.gameStarted = true;
+        loadLevel(0);
+        gameLoop();
+    });
 
-      <!-- Title Screen -->
-      <div id="title-screen" class="overlay-screen">
-        <div class="card">
-          <h1>Angel's Quest</h1>
-          <p>Welcome, Traveler. Collect the sacred tiles across three realms. Controls: WASD / Arrows or on-screen buttons (mobile).</p>
-          <div class="actions">
-            <button id="start-btn" class="btn">Begin Your Journey</button>
-          </div>
-        </div>
-      </div>
+    document.getElementById('retry-btn').addEventListener('click', () => {
+        location.reload();
+    });
 
-      <!-- Story -->
-      <div id="story-screen" class="overlay-screen hidden">
-        <div class="card">
-          <h2 id="story-title">Chapter</h2>
-          <p id="story-text"></p>
-          <div class="actions" style="justify-content:flex-end">
-            <button id="continue-btn" class="btn">Continue</button>
-          </div>
-        </div>
-      </div>
+    document.getElementById('replay-btn').addEventListener('click', () => {
+        location.reload();
+    });
 
-      <!-- HUD -->
-      <div id="hud">
-        <div class="hud-item" id="score">Tiles: 0 / 7</div>
-        <div class="hud-item" id="level">Level: 1</div>
-      </div>
+    // Load level
+    function loadLevel(levelIndex) {
+        gameState.currentLevel = levelIndex;
+        gameState.score = 0;
+        gameState.tiles = [];
+        gameState.enemies = [];
+        gameState.obstacles = [];
 
-      <!-- Player (CSS sprite) -->
-      <div id="player" aria-hidden="false" class="idle" title="Traveler">
-        <!-- layered parts -->
-        <div class="backpack"></div>
-        <div class="body"></div>
-        <div class="head"></div>
-        <div class="wing wing-left"></div>
-        <div class="wing wing-right"></div>
-      </div>
+        // Clear existing elements
+        document.querySelectorAll('.tile, .enemy, .obstacle, .ground, .safe-zone').forEach(el => el.remove());
 
-      <!-- Enemy container (CSS orb) -->
-      <div id="orbs"></div>
+        const level = LEVELS[levelIndex];
+        levelDisplay.textContent = `🌟 Realm: ${levelIndex + 1}`;
+        scoreDisplay.textContent = `✨ Relics: 0 / ${level.tiles.length}`;
 
-      <!-- Tiles container -->
-      <div id="tiles"></div>
+        // Reset player position
+        gameState.playerX = 200;
+        gameState.playerY = 200;
 
-      <!-- Particles -->
-      <div id="particles"></div>
+        // Add ground tiles
+        for (let x = 0; x < WORLD_WIDTH; x += 100) {
+            for (let y = 0; y < WORLD_HEIGHT; y += 100) {
+                const ground = document.createElement('div');
+                ground.className = 'ground';
+                ground.style.left = x + 'px';
+                ground.style.top = y + 'px';
+                ground.style.width = '100px';
+                ground.style.height = '100px';
+                world.appendChild(ground);
+            }
+        }
 
-      <!-- Mobile Controls -->
-      <div id="mobile-controls" class="hidden">
-        <div class="control-row"><div class="control-btn" data-key="w">↑</div></div>
-        <div class="control-row"><div class="control-btn" data-key="a">←</div><div class="control-btn" data-key="s">↓</div><div class="control-btn" data-key="d">→</div></div>
-      </div>
+        // Add safe zones
+        level.safeZones.forEach(zone => {
+            const safeZone = document.createElement('div');
+            safeZone.className = 'ground safe-zone';
+            safeZone.style.left = zone.x + 'px';
+            safeZone.style.top = zone.y + 'px';
+            safeZone.style.width = zone.w + 'px';
+            safeZone.style.height = zone.h + 'px';
+            world.appendChild(safeZone);
+        });
 
-      <!-- On-screen desktop hint -->
-      <div id="controls" class="hint">Use WASD or Arrow keys to move — avoid orbs that reset progress.</div>
+        // Spawn tiles
+        level.tiles.forEach((tileData, index) => {
+            const tile = document.createElement('div');
+            tile.className = `tile ${tileData.type}`;
+            tile.textContent = tileData.icon;
+            tile.style.left = tileData.x + 'px';
+            tile.style.top = tileData.y + 'px';
+            tile.dataset.index = index;
+            tile.style.animationDelay = index * 0.15 + 's';
+            world.appendChild(tile);
+            gameState.tiles.push({ 
+                element: tile, 
+                x: tileData.x, 
+                y: tileData.y, 
+                collected: false 
+            });
+        });
 
-      <!-- Win screen -->
-      <div id="win-screen" class="overlay-screen hidden">
-        <div class="card">
-          <h2>Well done, Traveler!</h2>
-          <p>You completed the quest.</p>
-          <div class="actions">
-            <button id="replay-btn" class="btn">Play Again</button>
-          </div>
-        </div>
-      </div>
+        // Spawn obstacles
+        level.obstacles.forEach((obs) => {
+            const obstacle = document.createElement('div');
+            obstacle.className = 'obstacle';
+            obstacle.style.left = obs.x + 'px';
+            obstacle.style.top = obs.y + 'px';
+            obstacle.style.width = obs.w + 'px';
+            obstacle.style.height = obs.h + 'px';
+            world.appendChild(obstacle);
+            gameState.obstacles.push({
+                x: obs.x,
+                y: obs.y,
+                w: obs.w,
+                h: obs.h
+            });
+        });
 
-    </div>
-  </div>
+        // Spawn enemies
+        level.enemies.forEach((enemyData, index) => {
+            const enemy = document.createElement('div');
+            enemy.className = 'enemy';
+            enemy.style.left = enemyData.x + 'px';
+            enemy.style.top = enemyData.y + 'px';
+            enemy.innerHTML = '<div class="enemy-sprite"></div>';
+            world.appendChild(enemy);
+            
+            gameState.enemies.push({
+                element: enemy,
+                x: enemyData.x,
+                y: enemyData.y,
+                patrol: enemyData.patrol,
+                patrolIndex: 0,
+                speed: enemyData.speed,
+                direction: 1
+            });
+        });
 
-  <script src="script.js"></script>
-</body>
-</html>
+        updateCamera();
+    }
+
+    // Keyboard input
+    document.addEventListener('keydown', (e) => {
+        keys[e.key.toLowerCase()] = true;
+    });
+
+    document.addEventListener('keyup', (e) => {
+        keys[e.key.toLowerCase()] = false;
+    });
+
+    // Update camera position
+    function updateCamera() {
+        gameState.cameraX = Math.max(0, Math.min(gameState.playerX - VIEWPORT_WIDTH / 2, WORLD_WIDTH - VIEWPORT_WIDTH));
+        gameState.cameraY = Math.max(0, Math.min(gameState.playerY - VIEWPORT_HEIGHT / 2, WORLD_HEIGHT - VIEWPORT_HEIGHT));
+        
+        world.style.transform = `translate(${-gameState.cameraX}px, ${-gameState.cameraY}px)`;
+    }
+
+    // Check collision with obstacles
+    function checkObstacleCollision(newX, newY) {
+        const playerRect = {
+            x: newX,
+            y: newY,
+            w: 50,
+            h: 50
+        };
+
+        for (let obs of gameState.obstacles) {
+            if (playerRect.x < obs.x + obs.w &&
+                playerRect.x + playerRect.w > obs.x &&
+                playerRect.y < obs.y + obs.h &&
+                playerRect.y + playerRect.h > obs.y) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Create particle effect
+    function createParticles(x, y, color = '#ffd700') {
+        for (let i = 0; i < 12; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            particle.style.background = color;
+            
+            const angle = (Math.PI * 2 * i) / 12;
+            const distance = 40 + Math.random() * 30;
+            particle.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+            particle.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+            
+            world.appendChild(particle);
+            setTimeout(() => particle.remove(), 1200);
+        }
+    }
+
+    // Update player position
+    function updatePlayerPosition() {
+        player.style.left = gameState.playerX + 'px';
+        player.style.top = gameState.playerY + 'px';
+    }
+
+    // Update enemy positions
+    function updateEnemies() {
+        gameState.enemies.forEach(enemy => {
+            const target = enemy.patrol[enemy.patrolIndex];
+            const dx = target[0] - enemy.x;
+            const dy = target[1] - enemy.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < 5) {
+                enemy.patrolIndex = (enemy.patrolIndex + 1) % enemy.patrol.length;
+            } else {
+                enemy.x += (dx / distance) * enemy.speed;
+                enemy.y += (dy / distance) * enemy.speed;
+                enemy.element.style.left = enemy.x + 'px';
+                enemy.element.style.top = enemy.y + 'px';
+            }
+        });
+    }
+
+    // Check enemy collision
+    function checkEnemyCollision() {
+        if (gameState.isInvulnerable) return;
+
+        for (let enemy of gameState.enemies) {
+            const distance = Math.sqrt(
+                Math.pow(gameState.playerX + 25 - (enemy.x + 22), 2) +
+                Math.pow(gameState.playerY + 25 - (enemy.y + 22), 2)
+            );
+
+            if (distance < 40) {
+                hitByEnemy();
+                return;
+            }
+        }
+    }
+
+    // Hit by enemy
+    function hitByEnemy() {
+        gameState.lives--;
+        updateLivesDisplay();
+        
+        if (gameState.lives <= 0) {
+            gameOver();
+            return;
+        }
+
+        // Reset player position
+        gameState.playerX = 200;
+        gameState.playerY = 200;
+        updatePlayerPosition();
+        updateCamera();
+
+        // Make invulnerable for 2 seconds
+        gameState.isInvulnerable = true;
+        player.style.opacity = '0.5';
+        
+        setTimeout(() => {
+            gameState.isInvulnerable = false;
+            player.style.opacity = '1';
+        }, 2000);
+
+        createParticles(gameState.playerX + 25, gameState.playerY + 25, '#ff4444');
+    }
+
+    // Update lives display
+    function updateLivesDisplay() {
+        const hearts = livesDisplay.querySelectorAll('.heart');
+        hearts.forEach((heart, index) => {
+            heart.style.opacity = index < gameState.lives ? '1' : '0.2';
+        });
+    }
+
+    // Game loop
+    function gameLoop() {
+        if (!gameState.gameStarted) return;
+
+        let newX = gameState.playerX;
+        let newY = gameState.playerY;
+
+        // Movement
+        if (keys['w'] || keys['arrowup']) {
+            newY = Math.max(0, gameState.playerY - gameState.playerSpeed);
+        }
+        if (keys['s'] || keys['arrowdown']) {
+            newY = Math.min(WORLD_HEIGHT - 50, gameState.playerY + gameState.playerSpeed);
+        }
+        if (keys['a'] || keys['arrowleft']) {
+            newX = Math.max(0, gameState.playerX - gameState.playerSpeed);
+        }
+        if (keys['d'] || keys['arrowright']) {
+            newX = Math.min(WORLD_WIDTH - 50, gameState.playerX + gameState.playerSpeed);
+        }
+
+        // Check obstacle collision
+        if (!checkObstacleCollision(newX, newY)) {
+            gameState.playerX = newX;
+            gameState.playerY = newY;
+        } else if (!checkObstacleCollision(newX, gameState.playerY)) {
+            gameState.playerX = newX;
+        } else if (!checkObstacleCollision(gameState.playerX, newY)) {
+            gameState.playerY = newY;
+        }
+
+        updatePlayerPosition();
+        updateCamera();
+        updateEnemies();
+        checkEnemyCollision();
+
+        // Check tile collisions
+        gameState.tiles.forEach((tile) => {
+            if (!tile.collected) {
+                const distance = Math.sqrt(
+                    Math.pow(gameState.playerX + 25 - (tile.x + 20), 2) +
+                    Math.pow(gameState.playerY + 25 - (tile.y + 20), 2)
+                );
+
+                if (distance < 40) {
+                    tile.collected = true;
+                    createParticles(tile.x + 20, tile.y + 20);
+                    tile.element.style.transform = 'scale(0)';
+                    setTimeout(() => tile.element.remove(), 300);
+                    
+                    gameState.score++;
+                    gameState.totalScore++;
+                    scoreDisplay.textContent = `✨ Relics: ${gameState.score} / ${LEVELS[gameState.currentLevel].tiles.length}`;
+
+                    // Check level completion
+                    if (gameState.score === LEVELS[gameState.currentLevel].tiles.length) {
+                        if (gameState.currentLevel < LEVELS.length - 1) {
+                            setTimeout(() => {
+                                gameState.currentLevel++;
+                                loadLevel(gameState.currentLevel);
+                            }, 1500);
+                        } else {
+                            setTimeout(() => winGame(), 1500);
+                        }
+                    }
+                }
+            }
+        });
+
+        requestAnimationFrame(gameLoop);
+    }
+
+    // Game over
+    function gameOver() {
+        gameState.gameStarted = false;
+        document.getElementById('go-score').textContent = `⭐ Relics Collected: ${gameState.totalScore}`;
+        document.getElementById('go-level').textContent = `🌟 Realm Reached: ${gameState.currentLevel + 1}`;
+        gameoverScreen.style.display = 'flex';
+    }
+
+    // Win game
+    function winGame() {
+        gameState.gameStarted = false;
+        document.getElementById('final-score').textContent = `⭐ Total Relics: ${gameState.totalScore}`;
+        document.getElementById('final-lives').textContent = `❤️ Lives Remaining: ${gameState.lives}`;
+        winScreen.style.display = 'flex';
+    }
+</script>
