@@ -1,364 +1,511 @@
-// ======= LEVEL CONFIG =======
+// Game configuration
+const WORLD_WIDTH = 1800;
+const WORLD_HEIGHT = 1400;
+const VIEWPORT_WIDTH = 900;
+const VIEWPORT_HEIGHT = 650;
+
 const LEVELS = [
-  {
-    name: "Meadow of Beginnings",
-    story: "The Meadow of Beginnings awaits. Gather the golden tiles that hold ancient wisdom...",
-    tiles: [
-      {x:150,y:150,type:'gold'}, {x:700,y:150,type:'gold'}, {x:425,y:300,type:'gold'},
-      {x:200,y:480,type:'gold'}, {x:650,y:480,type:'gold'}, {x:350,y:500,type:'gold'},
-      {x:500,y:500,type:'gold'}
-    ],
-    orbCount: 1
-  },
-  {
-    name: "Crystal Caverns",
-    story: "Deep within the Crystal Caverns, mystical gems await your discovery. Navigate carefully...",
-    tiles: [
-      {x:120,y:120,type:'crystal'}, {x:730,y:120,type:'crystal'}, {x:425,y:200,type:'crystal'},
-      {x:250,y:400,type:'crystal'}, {x:600,y:400,type:'crystal'}, {x:425,y:520,type:'crystal'},
-      {x:150,y:300,type:'crystal'}
-    ],
-    orbCount: 2
-  },
-  {
-    name: "Starlight Sanctuary",
-    story: "You've reached the final realm — the Starlight Sanctuary. Collect the celestial stars to complete your quest!",
-    tiles: [
-      {x:100,y:100,type:'star'}, {x:750,y:100,type:'star'}, {x:425,y:150,type:'star'},
-      {x:200,y:450,type:'star'}, {x:650,y:450,type:'star'}, {x:300,y:300,type:'star'},
-      {x:550,y:300,type:'star'}
-    ],
-    orbCount: 3
-  }
+    {
+        name: "Twilight Meadow",
+        tiles: [
+            { x: 300, y: 300, type: 'gold', icon: '⭐' },
+            { x: 700, y: 300, type: 'gold', icon: '⭐' },
+            { x: 1200, y: 300, type: 'gold', icon: '⭐' },
+            { x: 500, y: 600, type: 'gold', icon: '⭐' },
+            { x: 900, y: 600, type: 'gold', icon: '⭐' },
+            { x: 1400, y: 600, type: 'gold', icon: '⭐' },
+            { x: 300, y: 900, type: 'gold', icon: '⭐' },
+            { x: 700, y: 900, type: 'gold', icon: '⭐' },
+            { x: 1200, y: 900, type: 'gold', icon: '⭐' },
+            { x: 400, y: 1200, type: 'gold', icon: '⭐' },
+            { x: 800, y: 1200, type: 'gold', icon: '⭐' },
+            { x: 1200, y: 1200, type: 'gold', icon: '⭐' },
+            { x: 600, y: 450, type: 'gold', icon: '⭐' },
+            { x: 1000, y: 800, type: 'gold', icon: '⭐' },
+            { x: 500, y: 1050, type: 'gold', icon: '⭐' }
+        ],
+        enemies: [
+            { x: 500, y: 400, patrol: [[500, 400], [800, 400]], speed: 1.5 },
+            { x: 1000, y: 700, patrol: [[1000, 700], [1000, 1000]], speed: 1.2 },
+            { x: 600, y: 1000, patrol: [[400, 1000], [900, 1000]], speed: 1.8 }
+        ],
+        obstacles: [
+            { x: 200, y: 500, w: 150, h: 80 },
+            { x: 1100, y: 500, w: 180, h: 80 },
+            { x: 600, y: 750, w: 200, h: 100 },
+            { x: 350, y: 1100, w: 120, h: 120 }
+        ],
+        safeZones: [
+            { x: 100, y: 100, w: 250, h: 150 },
+            { x: 1450, y: 1200, w: 250, h: 150 }
+        ]
+    },
+    {
+        name: "Shadow Labyrinth",
+        tiles: [
+            { x: 250, y: 250, type: 'crystal', icon: '💎' },
+            { x: 1500, y: 250, type: 'crystal', icon: '💎' },
+            { x: 900, y: 400, type: 'crystal', icon: '💎' },
+            { x: 400, y: 600, type: 'crystal', icon: '💎' },
+            { x: 1300, y: 600, type: 'crystal', icon: '💎' },
+            { x: 700, y: 800, type: 'crystal', icon: '💎' },
+            { x: 300, y: 1000, type: 'crystal', icon: '💎' },
+            { x: 1100, y: 1000, type: 'crystal', icon: '💎' },
+            { x: 1500, y: 1150, type: 'crystal', icon: '💎' },
+            { x: 500, y: 450, type: 'crystal', icon: '💎' },
+            { x: 1200, y: 850, type: 'crystal', icon: '💎' },
+            { x: 800, y: 1150, type: 'crystal', icon: '💎' },
+            { x: 600, y: 300, type: 'crystal', icon: '💎' },
+            { x: 950, y: 650, type: 'crystal', icon: '💎' },
+            { x: 450, y: 1250, type: 'crystal', icon: '💎' }
+        ],
+        enemies: [
+            { x: 600, y: 500, patrol: [[600, 500], [1000, 500]], speed: 2 },
+            { x: 800, y: 900, patrol: [[500, 900], [1100, 900]], speed: 2.2 },
+            { x: 400, y: 700, patrol: [[400, 500], [400, 900]], speed: 1.8 },
+            { x: 1300, y: 800, patrol: [[1300, 600], [1300, 1000]], speed: 2 },
+            { x: 900, y: 300, patrol: [[700, 300], [1100, 300]], speed: 1.9 }
+        ],
+        obstacles: [
+            { x: 400, y: 350, w: 100, h: 200 },
+            { x: 700, y: 550, w: 300, h: 80 },
+            { x: 1200, y: 400, w: 100, h: 250 },
+            { x: 500, y: 950, w: 250, h: 100 },
+            { x: 1000, y: 1100, w: 150, h: 150 }
+        ],
+        safeZones: [
+            { x: 150, y: 150, w: 200, h: 200 },
+            { x: 1500, y: 50, w: 200, h: 200 }
+        ]
+    },
+    {
+        name: "Astral Sanctum",
+        tiles: [
+            { x: 300, y: 200, type: 'star', icon: '🌟' },
+            { x: 1400, y: 200, type: 'star', icon: '🌟' },
+            { x: 850, y: 350, type: 'star', icon: '🌟' },
+            { x: 500, y: 550, type: 'star', icon: '🌟' },
+            { x: 1200, y: 550, type: 'star', icon: '🌟' },
+            { x: 350, y: 800, type: 'star', icon: '🌟' },
+            { x: 900, y: 750, type: 'star', icon: '🌟' },
+            { x: 1450, y: 800, type: 'star', icon: '🌟' },
+            { x: 650, y: 1000, type: 'star', icon: '🌟' },
+            { x: 1100, y: 1050, type: 'star', icon: '🌟' },
+            { x: 400, y: 1250, type: 'star', icon: '🌟' },
+            { x: 1300, y: 1250, type: 'star', icon: '🌟' },
+            { x: 700, y: 450, type: 'star', icon: '🌟' },
+            { x: 1050, y: 850, type: 'star', icon: '🌟' },
+            { x: 850, y: 1200, type: 'star', icon: '🌟' }
+        ],
+        enemies: [
+            { x: 700, y: 400, patrol: [[500, 400], [1000, 400]], speed: 2.5 },
+            { x: 900, y: 650, patrol: [[700, 500], [1100, 800]], speed: 2.3 },
+            { x: 500, y: 900, patrol: [[300, 700], [700, 1100]], speed: 2.4 },
+            { x: 1300, y: 700, patrol: [[1200, 500], [1400, 900]], speed: 2.6 },
+            { x: 850, y: 1100, patrol: [[600, 1100], [1100, 1100]], speed: 2.2 },
+            { x: 400, y: 450, patrol: [[400, 300], [400, 600]], speed: 2.1 }
+        ],
+        obstacles: [
+            { x: 600, y: 300, w: 150, h: 150 },
+            { x: 1000, y: 500, w: 200, h: 100 },
+            { x: 450, y: 650, w: 100, h: 200 },
+            { x: 1250, y: 950, w: 150, h: 150 },
+            { x: 750, y: 1050, w: 180, h: 80 },
+            { x: 350, y: 1100, w: 120, h: 120 }
+        ],
+        safeZones: [
+            { x: 100, y: 100, w: 250, h: 200 },
+            { x: 1450, y: 50, w: 250, h: 200 },
+            { x: 800, y: 1280, w: 200, h: 100 }
+        ]
+    }
 ];
 
-// ======= GAME STATE =======
-const state = {
-  playerX: 425, playerY: 520, speed: 3.2, // slow movement
-  score: 0, totalScore: 0, level: 0,
-  tiles: [], orbs: [], gameStarted: false
+// Game state
+const gameState = {
+    playerX: 200,
+    playerY: 200,
+    playerSpeed: 3.5,
+    lives: 3,
+    score: 0,
+    totalScore: 0,
+    currentLevel: 0,
+    tiles: [],
+    enemies: [],
+    obstacles: [],
+    gameStarted: false,
+    isInvulnerable: false,
+    cameraX: 0,
+    cameraY: 0
 };
 
-// ======= DOM =======
-const playerEl = document.getElementById('player');
-const playerImg = null; // sprite is CSS-based
-const tilesContainer = document.getElementById('tiles');
-const orbsContainer = document.getElementById('orbs');
-const particles = document.getElementById('particles');
-const scoreEl = document.getElementById('score');
-const levelEl = document.getElementById('level');
+// DOM elements
+const world = document.getElementById('world');
+const player = document.getElementById('player');
+const scoreDisplay = document.getElementById('score');
+const levelDisplay = document.getElementById('level');
+const livesDisplay = document.getElementById('lives');
 const titleScreen = document.getElementById('title-screen');
-const storyScreen = document.getElementById('story-screen');
-const storyTitle = document.getElementById('story-title');
-const storyText = document.getElementById('story-text');
+const gameoverScreen = document.getElementById('gameover-screen');
 const winScreen = document.getElementById('win-screen');
+const gameContainer = document.getElementById('game-container');
+const starfield = document.getElementById('starfield');
 
-// starfield small helper
-function createStarfield(){
-  const field = document.getElementById('starfield');
-  for(let i=0;i<28;i++){
-    const s = document.createElement('div'); s.className='star';
-    const size = Math.random()*3 + 1;
-    s.style.width = s.style.height = size + 'px';
-    s.style.left = Math.random()*100 + '%';
-    s.style.top = Math.random()*100 + '%';
-    s.style.animationDelay = Math.random()*3 + 's';
-    field.appendChild(s);
-  }
+// Keyboard state
+const keys = {};
+
+// Create starfield
+function createStarfield() {
+    for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        const size = Math.random() * 3 + 1;
+        star.style.width = size + 'px';
+        star.style.height = size + 'px';
+        star.style.left = Math.random() * WORLD_WIDTH + 'px';
+        star.style.top = Math.random() * WORLD_HEIGHT + 'px';
+        star.style.animationDelay = Math.random() * 3 + 's';
+        starfield.appendChild(star);
+    }
 }
+
 createStarfield();
 
-// ======= UI Flow =======
+// Event listeners
 document.getElementById('start-btn').addEventListener('click', () => {
-  titleScreen.classList.add('hidden');
-  showStory();
-});
-document.getElementById('continue-btn').addEventListener('click', () => {
-  storyScreen.classList.add('hidden');
-  if(!state.gameStarted){
-    state.gameStarted = true;
+    titleScreen.classList.add('hidden');
+    gameState.gameStarted = true;
     loadLevel(0);
-    requestAnimationFrame(loop);
-  } else {
-    loadLevel(state.level);
-  }
-});
-document.getElementById('replay-btn').addEventListener('click', ()=> location.reload());
-
-function showStory(){
-  const lvl = LEVELS[state.level];
-  storyTitle.textContent = `Chapter ${state.level+1}: ${lvl.name}`;
-  storyText.textContent = lvl.story;
-  storyScreen.classList.remove('hidden');
-}
-
-// ======= Level / spawn logic =======
-function clearLevel(){
-  document.querySelectorAll('.tile').forEach(e => e.remove());
-  document.querySelectorAll('.orb').forEach(e => e.remove());
-  state.tiles = []; state.orbs = [];
-}
-
-function createSVG(type){
-  if(type==='gold') return `<svg viewBox="0 0 24 24" width="26" height="26"><path fill="#ffd86d" d="M12 2l2.4 5.5L20 10l-5 3.6L16 20 12 16.8 8 20l1-6.4L4 10l5.6-2.5L12 2z"/></svg>`;
-  if(type==='crystal') return `<svg viewBox="0 0 24 24" width="26" height="26"><path fill="#a8edea" d="M12 2l4 6 6 2-6 4-4 6-4-6L2 10l6-2 4-6z"/></svg>`;
-  return `<svg viewBox="0 0 24 24" width="26" height="26"><path fill="#ffe9a8" d="M12 .9l3.1 6.3L22 8.2l-5 4.8L18.2 22 12 18.6 5.8 22 7 13 2 8.2l6.9-1L12 .9z"/></svg>`;
-}
-
-function loadLevel(index){
-  clearLevel();
-  state.level = index;
-  state.score = 0;
-  const lvl = LEVELS[index];
-  levelEl.textContent = `Level: ${index+1}`;
-  scoreEl.textContent = `Tiles: 0 / ${lvl.tiles.length}`;
-
-  // place player center-ish
-  const gc = document.getElementById('game-container');
-  state.playerX = Math.floor(gc.clientWidth/2 - 32);
-  state.playerY = Math.floor(gc.clientHeight * 0.8 - 32);
-  updatePlayer();
-
-  // spawn tiles
-  for(let i=0;i<lvl.tiles.length;i++){
-    const t = lvl.tiles[i];
-    const el = document.createElement('div');
-    el.className = 'tile ' + t.type;
-    el.innerHTML = createSVG(t.type);
-    // If the level size is the design size (900x650), we stamp those coords relative to container size
-    const ratioX = gc.clientWidth / 900;
-    const ratioY = gc.clientHeight / 650;
-    const px = Math.round(t.x * ratioX);
-    const py = Math.round(t.y * ratioY);
-    el.style.left = px + 'px';
-    el.style.top = py + 'px';
-    tilesContainer.appendChild(el);
-    state.tiles.push({element: el, x: px, y: py, collected: false});
-  }
-
-  // spawn orbs (enemies)
-  for(let i=0;i<lvl.orbCount;i++){
-    spawnOrb();
-  }
-}
-
-// spawn orb at random edge
-function spawnOrb(){
-  const gc = document.getElementById('game-container');
-  const side = Math.floor(Math.random()*4);
-  let x,y;
-  if(side===0){ x = -40; y = rand(20, gc.clientHeight - 40); }
-  else if(side===1){ x = gc.clientWidth + 40; y = rand(20, gc.clientHeight - 40); }
-  else if(side===2){ x = rand(20, gc.clientWidth - 40); y = -40; }
-  else { x = rand(20, gc.clientWidth - 40); y = gc.clientHeight + 40; }
-  const el = document.createElement('div'); el.className = 'orb';
-  el.style.left = x + 'px'; el.style.top = y + 'px';
-  orbsContainer.appendChild(el);
-  const speed = 0.6 + 0.2 * state.level + Math.random()*0.6;
-  state.orbs.push({el,x,y,speed});
-}
-
-// ======= Input =======
-const keys = {};
-window.addEventListener('keydown', e => {
-  keys[e.key.toLowerCase()] = true;
-  if(['arrowup','arrowdown','arrowleft','arrowright'].includes(e.key.toLowerCase())) e.preventDefault();
-});
-window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
-
-// mobile buttons
-document.querySelectorAll('.control-btn').forEach(btn => {
-  btn.addEventListener('touchstart', e => { e.preventDefault(); keys[btn.dataset.key] = true; });
-  btn.addEventListener('touchend', e => { e.preventDefault(); keys[btn.dataset.key] = false; });
-  btn.addEventListener('mousedown', e => { keys[btn.dataset.key] = true; });
-  btn.addEventListener('mouseup', e => { keys[btn.dataset.key] = false; });
+    gameLoop();
 });
 
-// ======= Helpers =======
-function rand(a,b){ return Math.random() * (b-a) + a; }
-function rectOverlap(ax,ay,aw,ah,bx,by,bw,bh){
-  return !(ax+aw < bx || ax > bx + bw || ay+ah < by || ay > by + bh);
-}
-function updatePlayer(){
-  playerEl.style.left = Math.round(state.playerX) + 'px';
-  playerEl.style.top  = Math.round(state.playerY) + 'px';
-}
+document.getElementById('retry-btn').addEventListener('click', () => {
+    location.reload();
+});
 
-// particles
-function createParticles(cx,cy){
-  for(let i=0;i<8;i++){
-    const p = document.createElement('div'); p.className='p';
-    p.style.left = cx + 'px'; p.style.top = cy + 'px';
-    const angle = (Math.PI*2*i)/8; const dist = 18 + Math.random()*20;
-    p.style.setProperty('--tx', Math.cos(angle)*dist + 'px'); p.style.setProperty('--ty', Math.sin(angle)*dist + 'px');
-    particles.appendChild(p);
-    setTimeout(()=>p.remove(),900);
-  }
-}
+document.getElementById('replay-btn').addEventListener('click', () => {
+    location.reload();
+});
 
-// ======= Main loop =======
-let last = 0;
-function loop(ts){
-  if(!state.gameStarted) return;
-  if(!last) last = ts;
-  const dt = ts - last; last = ts;
+// Load level
+function loadLevel(levelIndex) {
+    gameState.currentLevel = levelIndex;
+    gameState.score = 0;
+    gameState.tiles = [];
+    gameState.enemies = [];
+    gameState.obstacles = [];
 
-  // movement
-  let nx = state.playerX, ny = state.playerY;
-  let moving = false;
-  playerEl.classList.remove('walk-left','walk-right','walk-up','walk-down','idle');
-  if(keys['w']||keys['arrowup']){ ny -= state.speed; moving = true; playerEl.classList.add('walk-up'); }
-  if(keys['s']||keys['arrowdown']){ ny += state.speed; moving = true; playerEl.classList.add('walk-down'); }
-  if(keys['a']||keys['arrowleft']){ nx -= state.speed; moving = true; playerEl.classList.add('walk-left'); }
-  if(keys['d']||keys['arrowright']){ nx += state.speed; moving = true; playerEl.classList.add('walk-right'); }
-  if(!moving) playerEl.classList.add('idle');
+    // Clear existing elements
+    document.querySelectorAll('.tile, .enemy, .obstacle, .ground, .safe-zone').forEach(el => el.remove());
 
-  // bounds
-  const gc = document.getElementById('game-container');
-  const pw = playerEl.offsetWidth, ph = playerEl.offsetHeight;
-  nx = Math.max(4, Math.min(nx, gc.clientWidth - pw - 4));
-  ny = Math.max(4, Math.min(ny, gc.clientHeight - ph - 4));
-  // apply collision with obstacles? (none included now)
-  state.playerX = nx; state.playerY = ny;
-  updatePlayer();
+    const level = LEVELS[levelIndex];
+    levelDisplay.textContent = `🌟 Realm: ${levelIndex + 1}`;
+    scoreDisplay.textContent = `✨ Relics: 0 / ${level.tiles.length}`;
 
-  // move orbs (chase)
-  for(const orb of state.orbs){
-    const dx = (state.playerX - orb.x), dy = (state.playerY - orb.y);
-    const dist = Math.hypot(dx,dy) || 1;
-    orb.x += (dx/dist) * orb.speed;
-    orb.y += (dy/dist) * orb.speed;
-    orb.el.style.left = Math.round(orb.x) + 'px';
-    orb.el.style.top  = Math.round(orb.y) + 'px';
-    // collision with player -> reset level (penalty)
-    if(rectOverlap(state.playerX, state.playerY, pw, ph, orb.x, orb.y, orb.el.offsetWidth, orb.el.offsetHeight)){
-      // flash and reset
-      flashAndReset();
-      return;
-    }
-  }
+    // Reset player position
+    gameState.playerX = 200;
+    gameState.playerY = 200;
 
-  // check tiles
-  for(const t of state.tiles){
-    if(!t.collected){
-      const dx = (state.playerX + pw/2) - (t.x + t.element.offsetWidth/2);
-      const dy = (state.playerY + ph/2) - (t.y + t.element.offsetHeight/2);
-      const d = Math.hypot(dx,dy);
-      if(d < 46){
-        t.collected = true;
-        createParticles(t.x + t.element.offsetWidth/2, t.y + t.element.offsetHeight/2);
-        t.element.classList.add('collected');
-        setTimeout(()=> t.element.remove(), 300);
-        state.score++; state.totalScore++;
-        scoreEl.textContent = `Tiles: ${state.score} / ${LEVELS[state.level].tiles.length}`;
-        // level complete?
-        if(state.score === LEVELS[state.level].tiles.length){
-          // next or win
-          if(state.level < LEVELS.length - 1){
-            state.gameStarted = false;
-            setTimeout(()=> { state.level++; showStory(); }, 700);
-            return;
-          } else {
-            state.gameStarted = false;
-            setTimeout(()=> win(), 700);
-            return;
-          }
+    // Add ground tiles
+    for (let x = 0; x < WORLD_WIDTH; x += 100) {
+        for (let y = 0; y < WORLD_HEIGHT; y += 100) {
+            const ground = document.createElement('div');
+            ground.className = 'ground';
+            ground.style.left = x + 'px';
+            ground.style.top = y + 'px';
+            ground.style.width = '100px';
+            ground.style.height = '100px';
+            world.appendChild(ground);
         }
-      }
     }
-  }
 
-  requestAnimationFrame(loop);
+    // Add safe zones
+    level.safeZones.forEach(zone => {
+        const safeZone = document.createElement('div');
+        safeZone.className = 'ground safe-zone';
+        safeZone.style.left = zone.x + 'px';
+        safeZone.style.top = zone.y + 'px';
+        safeZone.style.width = zone.w + 'px';
+        safeZone.style.height = zone.h + 'px';
+        world.appendChild(safeZone);
+    });
+
+    // Spawn tiles
+    level.tiles.forEach((tileData, index) => {
+        const tile = document.createElement('div');
+        tile.className = `tile ${tileData.type}`;
+        tile.textContent = tileData.icon;
+        tile.style.left = tileData.x + 'px';
+        tile.style.top = tileData.y + 'px';
+        tile.dataset.index = index;
+        tile.style.animationDelay = index * 0.15 + 's';
+        world.appendChild(tile);
+        gameState.tiles.push({ 
+            element: tile, 
+            x: tileData.x, 
+            y: tileData.y, 
+            collected: false 
+        });
+    });
+
+    // Spawn obstacles
+    level.obstacles.forEach((obs) => {
+        const obstacle = document.createElement('div');
+        obstacle.className = 'obstacle';
+        obstacle.style.left = obs.x + 'px';
+        obstacle.style.top = obs.y + 'px';
+        obstacle.style.width = obs.w + 'px';
+        obstacle.style.height = obs.h + 'px';
+        world.appendChild(obstacle);
+        gameState.obstacles.push({
+            x: obs.x,
+            y: obs.y,
+            w: obs.w,
+            h: obs.h
+        });
+    });
+
+    // Spawn enemies
+    level.enemies.forEach((enemyData, index) => {
+        const enemy = document.createElement('div');
+        enemy.className = 'enemy';
+        enemy.style.left = enemyData.x + 'px';
+        enemy.style.top = enemyData.y + 'px';
+        enemy.innerHTML = '<div class="enemy-sprite"></div>';
+        world.appendChild(enemy);
+        
+        gameState.enemies.push({
+            element: enemy,
+            x: enemyData.x,
+            y: enemyData.y,
+            patrol: enemyData.patrol,
+            patrolIndex: 0,
+            speed: enemyData.speed,
+            direction: 1
+        });
+    });
+
+    updateCamera();
 }
 
-// flash + reset logic when hit by orb
-function flashAndReset(){
-  const gc = document.getElementById('game-container');
-  gc.style.transition = 'filter 0.12s';
-  gc.style.filter = 'grayscale(.9) brightness(.6)';
-  setTimeout(()=> gc.style.filter = '', 220);
-  // reset current level after short pause
-  setTimeout(()=> loadLevel(state.level), 350);
+// Keyboard input
+document.addEventListener('keydown', (e) => {
+    keys[e.key.toLowerCase()] = true;
+});
+
+document.addEventListener('keyup', (e) => {
+    keys[e.key.toLowerCase()] = false;
+});
+
+// Update camera position
+function updateCamera() {
+    gameState.cameraX = Math.max(0, Math.min(gameState.playerX - VIEWPORT_WIDTH / 2, WORLD_WIDTH - VIEWPORT_WIDTH));
+    gameState.cameraY = Math.max(0, Math.min(gameState.playerY - VIEWPORT_HEIGHT / 2, WORLD_HEIGHT - VIEWPORT_HEIGHT));
+    
+    world.style.transform = `translate(${-gameState.cameraX}px, ${-gameState.cameraY}px)`;
 }
 
-// win
-function win(){
-  document.getElementById('win-screen').classList.remove('hidden');
+// Check collision with obstacles
+function checkObstacleCollision(newX, newY) {
+    const playerRect = {
+        x: newX,
+        y: newY,
+        w: 50,
+        h: 50
+    };
+
+    for (let obs of gameState.obstacles) {
+        if (playerRect.x < obs.x + obs.w &&
+            playerRect.x + playerRect.w > obs.x &&
+            playerRect.y < obs.y + obs.h &&
+            playerRect.y + playerRect.h > obs.y) {
+            return true;
+        }
+    }
+    return false;
 }
 
-// ======= Boot / load =======
-function loadLevel(index){
-  clearTimeout(); // no-op but safe
-  // clear containers
-  tilesContainer.innerHTML = ''; orbsContainer.innerHTML = ''; particles.innerHTML = '';
-  state.tiles = []; state.orbs = []; state.score = 0;
-  const lvl = LEVELS[index]; state.level = index;
-  levelEl.textContent = `Level: ${index+1}`;
-  scoreEl.textContent = `Tiles: 0 / ${lvl.tiles.length}`;
-
-  // position player
-  const gc = document.getElementById('game-container');
-  state.playerX = Math.round(gc.clientWidth/2 - playerEl.offsetWidth/2);
-  state.playerY = Math.round(gc.clientHeight * 0.75 - playerEl.offsetHeight/2);
-  updatePlayer();
-
-  // tiles (coords scaled from design 900x650)
-  for(const t of lvl.tiles){
-    const el = document.createElement('div'); el.className = 'tile ' + t.type;
-    el.innerHTML = createSVGPlaceholder(t.type);
-    const ratioX = gc.clientWidth / 900; const ratioY = gc.clientHeight / 650;
-    const px = Math.round(t.x * ratioX); const py = Math.round(t.y * ratioY);
-    el.style.left = px + 'px'; el.style.top = py + 'px';
-    tilesContainer.appendChild(el);
-    state.tiles.push({element: el, x: px, y: py, collected: false});
-  }
-
-  // spawn orbs
-  for(let i=0;i<lvl.orbCount;i++) spawnOrb();
-
-  // start loop
-  state.gameStarted = true;
-  requestAnimationFrame(loop);
+// Create particle effect
+function createParticles(x, y, color = '#ffd700') {
+    for (let i = 0; i < 12; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = x + 'px';
+        particle.style.top = y + 'px';
+        particle.style.background = color;
+        
+        const angle = (Math.PI * 2 * i) / 12;
+        const distance = 40 + Math.random() * 30;
+        particle.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+        particle.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+        
+        world.appendChild(particle);
+        setTimeout(() => particle.remove(), 1200);
+    }
 }
 
-// helper to create tiny svg inside tiles (same as earlier but inline here)
-function createSVGPlaceholder(type){
-  if(type==='gold') return `<svg viewBox="0 0 24 24" width="22" height="22"><path fill="#ffd86d" d="M12 2l2.4 5.5L20 10l-5 3.6L16 20 12 16.8 8 20l1-6.4L4 10l5.6-2.5L12 2z"/></svg>`;
-  if(type==='crystal') return `<svg viewBox="0 0 24 24" width="22" height="22"><path fill="#a8edea" d="M12 2l4 6 6 2-6 4-4 6-4-6L2 10l6-2 4-6z"/></svg>`;
-  return `<svg viewBox="0 0 24 24" width="22" height="22"><path fill="#ffe9a8" d="M12 .9l3.1 6.3L22 8.2l-5 4.8L18.2 22 12 18.6 5.8 22 7 13 2 8.2l6.9-1L12 .9z"/></svg>`;
+// Update player position
+function updatePlayerPosition() {
+    player.style.left = gameState.playerX + 'px';
+    player.style.top = gameState.playerY + 'px';
 }
 
-// tiny spawn orb uses spawnOrb function above; but ensure spawnOrb exists for loadLevel
-function spawnOrb(){
-  const gc = document.getElementById('game-container');
-  const side = Math.floor(Math.random()*4);
-  let x,y;
-  if(side===0){ x = -40; y = rand(20, gc.clientHeight - 40); }
-  else if(side===1){ x = gc.clientWidth + 40; y = rand(20, gc.clientHeight - 40); }
-  else if(side===2){ x = rand(20, gc.clientWidth - 40); y = -40; }
-  else { x = rand(20, gc.clientWidth - 40); y = gc.clientHeight + 40; }
-  const el = document.createElement('div'); el.className = 'orb';
-  el.style.left = x + 'px'; el.style.top = y + 'px';
-  orbsContainer.appendChild(el);
-  const speed = 0.6 + 0.15 * state.level + Math.random()*0.6;
-  state.orbs.push({el,x,y,speed});
+// Update enemy positions
+function updateEnemies() {
+    gameState.enemies.forEach(enemy => {
+        const target = enemy.patrol[enemy.patrolIndex];
+        const dx = target[0] - enemy.x;
+        const dy = target[1] - enemy.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < 5) {
+            enemy.patrolIndex = (enemy.patrolIndex + 1) % enemy.patrol.length;
+        } else {
+            enemy.x += (dx / distance) * enemy.speed;
+            enemy.y += (dy / distance) * enemy.speed;
+            enemy.element.style.left = enemy.x + 'px';
+            enemy.element.style.top = enemy.y + 'px';
+        }
+    });
 }
 
-// helper duplication because used earlier (kept here for clarity)
-function createSVGPlaceholder(type){ 
-  if(type==='gold') return `<svg viewBox="0 0 24 24" width="22" height="22"><path fill="#ffd86d" d="M12 2l2.4 5.5L20 10l-5 3.6L16 20 12 16.8 8 20l1-6.4L4 10l5.6-2.5L12 2z"/></svg>`;
-  if(type==='crystal') return `<svg viewBox="0 0 24 24" width="22" height="22"><path fill="#a8edea" d="M12 2l4 6 6 2-6 4-4 6-4-6L2 10l6-2 4-6z"/></svg>`;
-  return `<svg viewBox="0 0 24 24" width="22" height="22"><path fill="#ffe9a8" d="M12 .9l3.1 6.3L22 8.2l-5 4.8L18.2 22 12 18.6 5.8 22 7 13 2 8.2l6.9-1L12 .9z"/></svg>`;
+// Check enemy collision
+function checkEnemyCollision() {
+    if (gameState.isInvulnerable) return;
+
+    for (let enemy of gameState.enemies) {
+        const distance = Math.sqrt(
+            Math.pow(gameState.playerX + 25 - (enemy.x + 22), 2) +
+            Math.pow(gameState.playerY + 25 - (enemy.y + 22), 2)
+        );
+
+        if (distance < 40) {
+            hitByEnemy();
+            return;
+        }
+    }
 }
 
-// ======= Start by loading first menu =======
-function init(){
-  // place CSS player default
-  const gc = document.getElementById('game-container');
-  state.playerX = Math.round(gc.clientWidth/2 - playerEl.offsetWidth/2);
-  state.playerY = Math.round(gc.clientHeight * 0.75 - playerEl.offsetHeight/2);
-  updatePlayer();
-  // responsive mobile controls toggle
-  if(window.innerWidth < 780) document.getElementById('mobile-controls').classList.remove('hidden');
+// Hit by enemy
+function hitByEnemy() {
+    gameState.lives--;
+    updateLivesDisplay();
+    
+    if (gameState.lives <= 0) {
+        gameOver();
+        return;
+    }
+
+    // Reset player position
+    gameState.playerX = 200;
+    gameState.playerY = 200;
+    updatePlayerPosition();
+    updateCamera();
+
+    // Make invulnerable for 2 seconds
+    gameState.isInvulnerable = true;
+    player.style.opacity = '0.5';
+    
+    setTimeout(() => {
+        gameState.isInvulnerable = false;
+        player.style.opacity = '1';
+    }, 2000);
+
+    createParticles(gameState.playerX + 25, gameState.playerY + 25, '#ff4444');
 }
-init();
+
+// Update lives display
+function updateLivesDisplay() {
+    const hearts = livesDisplay.querySelectorAll('.heart');
+    hearts.forEach((heart, index) => {
+        heart.style.opacity = index < gameState.lives ? '1' : '0.2';
+    });
+}
+
+// Game loop
+function gameLoop() {
+    if (!gameState.gameStarted) return;
+
+    let newX = gameState.playerX;
+    let newY = gameState.playerY;
+
+    // Movement
+    if (keys['w'] || keys['arrowup']) {
+        newY = Math.max(0, gameState.playerY - gameState.playerSpeed);
+    }
+    if (keys['s'] || keys['arrowdown']) {
+        newY = Math.min(WORLD_HEIGHT - 50, gameState.playerY + gameState.playerSpeed);
+    }
+    if (keys['a'] || keys['arrowleft']) {
+        newX = Math.max(0, gameState.playerX - gameState.playerSpeed);
+    }
+    if (keys['d'] || keys['arrowright']) {
+        newX = Math.min(WORLD_WIDTH - 50, gameState.playerX + gameState.playerSpeed);
+    }
+
+    // Check obstacle collision
+    if (!checkObstacleCollision(newX, newY)) {
+        gameState.playerX = newX;
+        gameState.playerY = newY;
+    } else if (!checkObstacleCollision(newX, gameState.playerY)) {
+        gameState.playerX = newX;
+    } else if (!checkObstacleCollision(gameState.playerX, newY)) {
+        gameState.playerY = newY;
+    }
+
+    updatePlayerPosition();
+    updateCamera();
+    updateEnemies();
+    checkEnemyCollision();
+
+    // Check tile collisions
+    gameState.tiles.forEach((tile) => {
+        if (!tile.collected) {
+            const distance = Math.sqrt(
+                Math.pow(gameState.playerX + 25 - (tile.x + 20), 2) +
+                Math.pow(gameState.playerY + 25 - (tile.y + 20), 2)
+            );
+
+            if (distance < 40) {
+                tile.collected = true;
+                createParticles(tile.x + 20, tile.y + 20);
+                tile.element.style.transform = 'scale(0)';
+                setTimeout(() => tile.element.remove(), 300);
+                
+                gameState.score++;
+                gameState.totalScore++;
+                scoreDisplay.textContent = `✨ Relics: ${gameState.score} / ${LEVELS[gameState.currentLevel].tiles.length}`;
+
+                // Check level completion
+                if (gameState.score === LEVELS[gameState.currentLevel].tiles.length) {
+                    if (gameState.currentLevel < LEVELS.length - 1) {
+                        setTimeout(() => {
+                            gameState.currentLevel++;
+                            loadLevel(gameState.currentLevel);
+                        }, 1500);
+                    } else {
+                        setTimeout(() => winGame(), 1500);
+                    }
+                }
+            }
+        }
+    });
+
+    requestAnimationFrame(gameLoop);
+}
+
+// Game over
+function gameOver() {
+    gameState.gameStarted = false;
+    document.getElementById('go-score').textContent = `⭐ Relics Collected: ${gameState.totalScore}`;
+    document.getElementById('go-level').textContent = `🌟 Realm Reached: ${gameState.currentLevel + 1}`;
+    gameoverScreen.style.display = 'flex';
+}
+
+// Win game
+function winGame() {
+    gameState.gameStarted = false;
+    document.getElementById('final-score').textContent = `⭐ Total Relics: ${gameState.totalScore}`;
+    document.getElementById('final-lives').textContent = `❤️ Lives Remaining: ${gameState.lives}`;
+    winScreen.style.display = 'flex';
+}
